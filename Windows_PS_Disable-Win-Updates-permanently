@@ -1,7 +1,11 @@
-#Beachte auch die Windows-Update-Einstellungen:
-#Das hier deaktiviert die Windows Updates permanent (Hochriskant: nur empfehlenswert auf Test-Maschinen !!!) 
+#last Tested on Win10 / Win11  @ 24.07.2023
+#disables Windows-Updates permanently by setting the Logon Name of the Service to ./guest  or ./gast with an invalid password
+#this is the only way to disable Windows Updates permanently because of Microsofts aggressiv restarting methods of the Service.
 
-sc.exe config "wuauserv" obj= ".\Gast" password= "fuckyouwindowsupdatehaha"
-sc.exe config "wuauserv" obj= ".\Guest" password= "fuckyouwindowsupdatehaha"
+#Please Note
+#This is a high risk action and should only be used on Test-VMs !! 
+
+sc.exe config "wuauserv" obj= ".\Gast" password= "fuckyouwindowsupdatehaha" #if you have an GERMAN os
+sc.exe config "wuauserv" obj= ".\Guest" password= "fuckyouwindowsupdatehaha" #if you have an English OS
 Restart-Service "wuauserv"
 Get-Service "wuauserv"
