@@ -1,4 +1,6 @@
+#last Tested on Win10 / Win11  @ 24.07.2023
 #disables Energy-Saving / Hibernate / Display off
+
 powercfg.exe -x -monitor-timeout-ac 0
 powercfg.exe -x -monitor-timeout-dc 0
 powercfg.exe -x -disk-timeout-ac 0
