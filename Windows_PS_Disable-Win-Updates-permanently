@@ -1,0 +1,7 @@
+#Beachte auch die Windows-Update-Einstellungen:
+#Das hier deaktiviert die Windows Updates permanent (Hochriskant: nur empfehlenswert auf Test-Maschinen !!!) 
+
+sc.exe config "wuauserv" obj= ".\Gast" password= "fuckyouwindowsupdatehaha"
+sc.exe config "wuauserv" obj= ".\Guest" password= "fuckyouwindowsupdatehaha"
+Restart-Service "wuauserv"
+Get-Service "wuauserv"
