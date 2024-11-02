@@ -1,11 +1,7 @@
 #!/bin/sh
 
-
-### Dont forget to make the script executable 
-################
-#  chmod +x  /vmfs/volumes/datastore1/VMWare-ESXi-Backup.sh
-################
-
+### Make the script executable:
+# chmod +x /vmfs/volumes/datastore1/VMWare-ESXi-Backup.sh
 
 # Prompt to back up all VMs or a specific one
 echo "Do you want to backup all VMs or just one? (all/one)"
@@ -56,8 +52,8 @@ for VM_ID in $VM_IDS; do
     cp -rfp "${DIR_VM}/${VM_NAME}.vmsd" "${DIR_TARGET}/"
     echo "Configuration files copied for VM ${VM_NAME}."
 
-    # Create a snapshot with the BAK- prefix
-    vim-cmd vmsvc/snapshot.create ${VM_ID} "BAK-${VM_NAME} ${DATE_OF_BACKUP}" "Snapshot for backup" 1 1
+    # Create a snapshot
+    vim-cmd vmsvc/snapshot.create ${VM_ID} "${VM_NAME} ${DATE_OF_BACKUP}" "Snapshot for backup" 1 1
     echo "Snapshot created for VM ${VM_NAME}."
 
     # Clone the VM disk to USB
@@ -65,28 +61,16 @@ for VM_ID in $VM_IDS; do
     vmkfstools -i "${DIR_VM}/${VM_NAME}.vmdk" "${DIR_TARGET}/${VM_NAME}.vmdk" -d thin
     echo "VM disk cloned successfully for VM ${VM_NAME}."
 
-    # Remove only snapshots with the BAK- prefix
-    echo "Checking and removing snapshots with prefix 'BAK-' for VM ID ${VM_ID}..."
-    vim-cmd vmsvc/snapshot.get ${VM_ID} | while read -r line; do
-        echo "Processing line: $line"
+    # Remove all snapshots
+    echo "Removing all snapshots for VM ID ${VM_ID}..."
+    vim-cmd vmsvc/snapshot.removeall ${VM_ID}
+    echo "All snapshots removed for VM ${VM_NAME}."
 
-        # Check if the line contains "Snapshot Name" and "BAK-"
-        if echo "$line" | grep -q "Snapshot Name.*BAK-"; then
-            SNAPSHOT_NAME=$(echo "$line" | awk -F': ' '{print $2}')
-            echo "Found snapshot with BAK- prefix: $SNAPSHOT_NAME"
-
-            # Get the Snapshot ID from the next line by reading it directly
-            read -r id_line
-            echo "Processing ID line: $id_line"
-            SNAPSHOT_ID=$(echo "$id_line" | awk -F': ' '{print $2}')
-            echo "Snapshot ID for deletion: $SNAPSHOT_ID"
-
-            # Attempt to remove the snapshot
-            echo "Deleting snapshot with ID $SNAPSHOT_ID for VM ${VM_ID}"
-            vim-cmd vmsvc/snapshot.remove ${VM_ID} ${SNAPSHOT_ID}
-        fi
-    done
-    echo "Snapshot cleanup completed for VM ${VM_NAME}."
+    # Lock check on .vmdk files
+    echo "Checking for locks on ${DIR_TARGET}/${VM_NAME}.vmdk:"
+    vmfsfilelockinfo -p "${DIR_TARGET}/${VM_NAME}.vmdk"
+    echo "Running lock test with vmkfstools:"
+    vmkfstools -D "${DIR_TARGET}/${VM_NAME}.vmdk"
 
     # Verify the backup files
     echo "Verifying backup files for VM ${VM_NAME} in ${DIR_TARGET}:"
