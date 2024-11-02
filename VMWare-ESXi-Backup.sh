@@ -46,11 +46,10 @@ for VM_ID in $VM_IDS; do
     mkdir -p "${DIR_TARGET}"
     echo "Backup directory created at: ${DIR_TARGET}"
 
-    # Copy VM configuration files
-    cp -rfp "${DIR_VM}/${VM_NAME}.vmx" "${DIR_TARGET}/"
+    # Copy initial VM configuration files (except .vmx)
     cp -rfp "${DIR_VM}/${VM_NAME}.nvram" "${DIR_TARGET}/"
     cp -rfp "${DIR_VM}/${VM_NAME}.vmsd" "${DIR_TARGET}/"
-    echo "Configuration files copied for VM ${VM_NAME}."
+    echo "Initial configuration files copied for VM ${VM_NAME}."
 
     # Create a snapshot
     vim-cmd vmsvc/snapshot.create ${VM_ID} "${VM_NAME} ${DATE_OF_BACKUP}" "Snapshot for backup" 1 1
@@ -65,6 +64,10 @@ for VM_ID in $VM_IDS; do
     echo "Removing all snapshots for VM ID ${VM_ID}..."
     vim-cmd vmsvc/snapshot.removeall ${VM_ID}
     echo "All snapshots removed for VM ${VM_NAME}."
+
+    # Copy the updated .vmx file after snapshots are removed
+    cp -rfp "${DIR_VM}/${VM_NAME}.vmx" "${DIR_TARGET}/"
+    echo "Updated .vmx file copied for VM ${VM_NAME} after snapshot removal."
 
     # Lock check on .vmdk files
     echo "Checking for locks on ${DIR_TARGET}/${VM_NAME}.vmdk:"
