@@ -1,5 +1,12 @@
 #!/bin/sh
 
+
+### Dont forget to make the script executable 
+################
+#  chmod +x  /vmfs/volumes/datastore1/VMWare-ESXi-Backup.sh
+################
+
+
 # Prompt to back up all VMs or a specific one
 echo "Do you want to backup all VMs or just one? (all/one)"
 read -r backup_choice
