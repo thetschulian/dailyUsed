@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heatpump Betriebsstatus Tracker</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        table {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="text-center">Heatpump Betriebsstatus Tracker</h2>
+        <div class="card mt-4">
+            <div class="card-body">
+                <h5 class="card-title">Upload your CSV file to see the daily status counts:</h5>
+                <input type="file" id="csvFileInput" class="form-control" accept=".csv">
+            </div>
+        </div>
+        <div id="tableContainer" class="mt-4"></div>
+    </div>
+
+    <script>
+        document.getElementById('csvFileInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const csv = e.target.result;
+                    const data = parseCSV(csv);
+                    const filteredData = filterData(data);
+                    const aggregatedData = aggregateData(filteredData);
+                    displayTable(aggregatedData);
+                };
+                reader.readAsText(file, 'UTF-8'); // Use UTF-8 to properly read special characters
+            }
+        });
+
+        function parseCSV(csv) {
+            const lines = csv.split('\n');
+            const result = [];
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (line) {
+                    const columns = line.split(',');
+                    const state = columns[1].normalize("NFC");  // Normalize the value to ensure consistency for special characters
+                    result.push({
+                        entity_id: columns[0],
+                        state: state,
+                        last_changed: new Date(columns[2])
+                    });
+                }
+            }
+            console.log("Parsed Data: ", result); // Debug output to verify parsed data
+            return result;
+        }
+
+        function filterData(data) {
+            // Remove "unbekannt", "unavailable", "Undefiniert", and "unknown" from the data, also merge consecutive states
+            const filtered = [];
+            let previousState = null;
+
+            data.forEach(entry => {
+                const ignoreStates = ['null', 'unavailable', 'Undefiniert', 'unknown'];
+                if (ignoreStates.includes(entry.state)) {
+                    // Skip these states but keep track of the previous state
+                    return;
+                }
+                // Prevent counting duplicate states in sequence if they are interrupted by ignored states
+                if (previousState && previousState.state === entry.state) {
+                    return;
+                }
+                filtered.push(entry);
+                previousState = entry;
+            });
+            console.log("Filtered Data: ", filtered); // Debug output to verify filtered data
+            return filtered;
+        }
+
+        function aggregateData(data) {
+            const aggregation = {};
+            data.forEach(entry => {
+                const date = entry.last_changed.toISOString().split('T')[0];
+                const normalizedState = entry.state.normalize("NFC"); // Ensure the state is normalized
+
+                if (!aggregation[date]) {
+                    aggregation[date] = {
+                        Heizbetrieb: 0,
+                        Warmwasserbetrieb: 0,
+                        "Ölrückführung": 0,
+                        Standzeit: 0,
+                        Abtauen: 0
+                    };
+                }
+                // Check if the state exists in the aggregation object to increment
+                if (Object.keys(aggregation[date]).includes(normalizedState)) {
+                    aggregation[date][normalizedState]++;
+                }
+            });
+            console.log("Aggregated Data: ", aggregation); // Debug output to verify aggregation results
+            return aggregation;
+        }
+
+        function displayTable(aggregatedData) {
+            let html = '<table class="table table-bordered table-striped">';
+            html += '<thead class="thead-dark">';
+            html += '<tr>';
+            html += '<th>Date</th>';
+            html += '<th>Heizbetrieb</th>';
+            html += '<th>Warmwasserbetrieb</th>';
+            html += '<th>Ölrückführung</th>';
+            html += '<th>Standzeit</th>';
+            html += '<th>Abtauen</th>';
+            html += '</tr>';
+            html += '</thead>';
+            html += '<tbody>';
+
+            for (const date in aggregatedData) {
+                html += '<tr>';
+                html += `<td>${date}</td>`;
+                html += `<td>${aggregatedData[date].Heizbetrieb}</td>`;
+                html += `<td>${aggregatedData[date].Warmwasserbetrieb}</td>`;
+                html += `<td>${aggregatedData[date]["Ölrückführung"]}</td>`;
+                html += `<td>${aggregatedData[date].Standzeit}</td>`;
+                html += `<td>${aggregatedData[date].Abtauen}</td>`;
+                html += '</tr>';
+            }
+
+            html += '</tbody>';
+            html += '</table>';
+
+            document.getElementById('tableContainer').innerHTML = html;
+        }
+    </script>
+</body>
+</html>
