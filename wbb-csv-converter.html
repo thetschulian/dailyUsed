@@ -37,7 +37,7 @@
             <div class="card">
                 <div class="card-header" id="headingOne">
                     <h5 class="mb-0">
-                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
                             View Data Table
                         </button>
                     </h5>
@@ -223,45 +223,49 @@
                 pieChartInstance.destroy();
             }
 
-            pieChartInstance = new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: ['Heizbetrieb', 'Warmwasserbetrieb', 'Ölrückführung', 'Standzeit', 'Abtauen'],
-                    datasets: [{
-                        data: [
-                            data.Heizbetrieb,
-                            data.Warmwasserbetrieb,
-                            data["Ölrückführung"],
-                            data.Standzeit,
-                            data.Abtauen
-                        ],
-                        backgroundColor: [
-                            '#007bff', '#28a745', '#dc3545', '#ffc107', '#17a2b8'
-                        ]
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'top'
-                        },
-                        datalabels: {
-                            color: '#fff',
-                            anchor: 'end',
-                            align: 'start',
-                            formatter: (value) => {
-                                return value;
+            if (typeof Chart !== 'undefined') {
+                pieChartInstance = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Heizbetrieb', 'Warmwasserbetrieb', 'Ölrückführung', 'Standzeit', 'Abtauen'],
+                        datasets: [{
+                            data: [
+                                data.Heizbetrieb,
+                                data.Warmwasserbetrieb,
+                                data["Ölrückführung"],
+                                data.Standzeit,
+                                data.Abtauen
+                            ],
+                            backgroundColor: [
+                                '#007bff', '#28a745', '#dc3545', '#ffc107', '#17a2b8'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top'
                             },
-                            font: {
-                                weight: 'bold'
+                            datalabels: {
+                                color: '#fff',
+                                anchor: 'end',
+                                align: 'start',
+                                formatter: (value) => {
+                                    return value;
+                                },
+                                font: {
+                                    weight: 'bold'
+                                }
                             }
                         }
-                    }
-                },
-                plugins: [ChartDataLabels]
-            });
+                    },
+                    plugins: [ChartDataLabels]
+                });
+            } else {
+                console.error("Chart.js library is not loaded.");
+            }
         }
     </script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
