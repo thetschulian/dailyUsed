@@ -6,17 +6,6 @@
     <title>Heatpump Betriebsstatus Tracker</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        window.jQuery ? console.log("jQuery loaded successfully.") : console.error("Failed to load jQuery.");
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        window.Chart ? console.log("Chart.js loaded successfully.") : console.error("Failed to load Chart.js.");
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
-    <script>
-        window.ChartDataLabels ? console.log("ChartDataLabels plugin loaded successfully.") : console.error("Failed to load ChartDataLabels plugin.");
-    </script>
     <style>
         body {
             background-color: #f8f9fa;
@@ -26,10 +15,6 @@
         }
         table {
             margin-top: 20px;
-        }
-        #pieChartContainer {
-            position: relative;
-            height: 400px;
         }
     </style>
 </head>
@@ -42,70 +27,24 @@
                 <input type="file" id="csvFileInput" class="form-control" accept=".csv">
             </div>
         </div>
-        <div class="accordion mt-4" id="accordionExample">
-            <div class="card">
-                <div class="card-header" id="headingOne">
-                    <h5 class="mb-0">
-                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-                            View Data Table
-                        </button>
-                    </h5>
-                </div>
-                <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
-                    <div class="card-body" id="tableContainer">
-                        <!-- Table will be injected here -->
-                    </div>
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-header" id="headingTwo">
-                    <h5 class="mb-0">
-                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo" id="pieChartAccordionButton">
-                            View Pie Chart
-                        </button>
-                    </h5>
-                </div>
-                <div id="collapseTwo" class="collapse show" aria-labelledby="headingTwo" data-parent="#accordionExample">
-                    <div class="card-body">
-                        <label for="dateSelector">Select a Date:</label>
-                        <select id="dateSelector" class="form-control mb-3"></select>
-                        <div id="pieChartContainer">
-                            <canvas id="pieChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <div id="tableContainer" class="mt-4"></div>
     </div>
 
     <script>
-        let aggregatedData = {};
-        let pieChartInstance = null;
-
-        window.onload = function() {
-            document.getElementById('csvFileInput').addEventListener('change', function(event) {
-                const file = event.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const csv = e.target.result;
-                        const data = parseCSV(csv);
-                        const filteredData = filterData(data);
-                        aggregatedData = aggregateData(filteredData);
-                        displayTable(aggregatedData);
-                        populateDateSelector(aggregatedData);
-                        // Close the Table Accordion and Open the Pie Chart Accordion by default
-                        if (window.jQuery) {
-                            $('#collapseOne').collapse('hide');
-                            $('#collapseTwo').collapse('show');
-                        } else {
-                            console.error("jQuery is not loaded.");
-                        }
-                    };
-                    reader.readAsText(file, 'UTF-8'); // Use UTF-8 to properly read special characters
-                }
-            });
-        };
+        document.getElementById('csvFileInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const csv = e.target.result;
+                    const data = parseCSV(csv);
+                    const filteredData = filterData(data);
+                    const aggregatedData = aggregateData(filteredData);
+                    displayTable(aggregatedData);
+                };
+                reader.readAsText(file, 'UTF-8'); // Use UTF-8 to properly read special characters
+            }
+        });
 
         function parseCSV(csv) {
             const lines = csv.split('\n');
@@ -202,87 +141,6 @@
 
             document.getElementById('tableContainer').innerHTML = html;
         }
-
-        function populateDateSelector(aggregatedData) {
-            const dateSelector = document.getElementById('dateSelector');
-            dateSelector.innerHTML = '';
-
-            let defaultDate = null;
-            for (const date in aggregatedData) {
-                const option = document.createElement('option');
-                option.value = date;
-                option.textContent = date;
-                dateSelector.appendChild(option);
-                defaultDate = date; // Set the most recent date as default
-            }
-
-            // Set the most recent date as the default selected option
-            if (defaultDate) {
-                dateSelector.value = defaultDate;
-                displayPieChart(defaultDate);
-            }
-
-            dateSelector.addEventListener('change', function() {
-                const selectedDate = dateSelector.value;
-                if (selectedDate) {
-                    displayPieChart(selectedDate);
-                }
-            });
-        }
-
-        function displayPieChart(date) {
-            const data = aggregatedData[date];
-            const ctx = document.getElementById('pieChart').getContext('2d');
-
-            if (pieChartInstance) {
-                pieChartInstance.destroy();
-            }
-
-            if (typeof Chart !== 'undefined') {
-                pieChartInstance = new Chart(ctx, {
-                    type: 'pie',
-                    data: {
-                        labels: ['Heizbetrieb', 'Warmwasserbetrieb', 'Ölrückführung', 'Standzeit', 'Abtauen'],
-                        datasets: [{
-                            data: [
-                                data.Heizbetrieb,
-                                data.Warmwasserbetrieb,
-                                data["Ölrückführung"],
-                                data.Standzeit,
-                                data.Abtauen
-                            ],
-                            backgroundColor: [
-                                '#007bff', '#28a745', '#dc3545', '#ffc107', '#17a2b8'
-                            ]
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'top'
-                            },
-                            datalabels: {
-                                color: '#fff',
-                                anchor: 'end',
-                                align: 'start',
-                                formatter: (value) => {
-                                    return value;
-                                },
-                                font: {
-                                    weight: 'bold'
-                                }
-                            }
-                        }
-                    },
-                    plugins: [ChartDataLabels]
-                });
-            } else {
-                console.error("Chart.js library is not loaded.");
-            }
-        }
     </script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
