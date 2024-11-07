@@ -6,8 +6,17 @@
     <title>Heatpump Betriebsstatus Tracker</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        window.jQuery ? console.log("jQuery loaded successfully.") : console.error("Failed to load jQuery.");
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        window.Chart ? console.log("Chart.js loaded successfully.") : console.error("Failed to load Chart.js.");
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <script>
+        window.ChartDataLabels ? console.log("ChartDataLabels plugin loaded successfully.") : console.error("Failed to load ChartDataLabels plugin.");
+    </script>
     <style>
         body {
             background-color: #f8f9fa;
@@ -73,24 +82,30 @@
         let aggregatedData = {};
         let pieChartInstance = null;
 
-        document.getElementById('csvFileInput').addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const csv = e.target.result;
-                    const data = parseCSV(csv);
-                    const filteredData = filterData(data);
-                    aggregatedData = aggregateData(filteredData);
-                    displayTable(aggregatedData);
-                    populateDateSelector(aggregatedData);
-                    // Close the Table Accordion and Open the Pie Chart Accordion by default
-                    $('#collapseOne').collapse('hide');
-                    $('#collapseTwo').collapse('show');
-                };
-                reader.readAsText(file, 'UTF-8'); // Use UTF-8 to properly read special characters
-            }
-        });
+        window.onload = function() {
+            document.getElementById('csvFileInput').addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const csv = e.target.result;
+                        const data = parseCSV(csv);
+                        const filteredData = filterData(data);
+                        aggregatedData = aggregateData(filteredData);
+                        displayTable(aggregatedData);
+                        populateDateSelector(aggregatedData);
+                        // Close the Table Accordion and Open the Pie Chart Accordion by default
+                        if (window.jQuery) {
+                            $('#collapseOne').collapse('hide');
+                            $('#collapseTwo').collapse('show');
+                        } else {
+                            console.error("jQuery is not loaded.");
+                        }
+                    };
+                    reader.readAsText(file, 'UTF-8'); // Use UTF-8 to properly read special characters
+                }
+            });
+        };
 
         function parseCSV(csv) {
             const lines = csv.split('\n');
