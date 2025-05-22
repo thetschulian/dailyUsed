@@ -5,7 +5,7 @@ services:
     restart: always
     environment:
       POSTGRES_DB: vaultwarden
-      POSTGRES_USER: vaultuser
+      POSTGRES_USER: vaultdb
       POSTGRES_PASSWORD: changeme
     volumes:
       - pgdata:/var/lib/postgresql/data
