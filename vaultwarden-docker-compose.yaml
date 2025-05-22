@@ -1,0 +1,35 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: vaultwarden-db
+    restart: always
+    environment:
+      POSTGRES_DB: vaultwarden
+      POSTGRES_USER: vaultuser
+      POSTGRES_PASSWORD: changeme
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - vaultwarden_net
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    restart: always
+    depends_on:
+      - postgres
+    environment:
+      ROCKET_TLS: '{certs="/certs/vaultwarden.crt",key="/certs/vaultwarden.key"}'
+      SIGNUPS_ALLOWED: "true"
+      ADMIN_TOKEN: changeme  #only used on initial setup, than stored in ./vw-data/config.json
+      DATABASE_URL: postgres://vaultdb:changeme@postgres:5432/vaultwarden
+    volumes:
+      - ./vw-data:/data
+      - ./certs:/certs:ro
+    ports:
+      - "443:80"  # expose Vaultwarden on port 443 without Caddy
+    networks:
+      - vaultwarden_net
+volumes:
+  pgdata:
+networks:
+  vaultwarden_net:
