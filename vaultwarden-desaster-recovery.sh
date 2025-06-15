@@ -106,6 +106,7 @@ echo "You can now copy the next block"
 #################################################
 
 echo "Import the SQL Dump now:"
+echo "If you skip this, you have a clean database!"
 cat $BASE_DIR/$BACKUP_SQL_NAME.sql | sudo docker exec -i $PG_CONTAINER psql -U $PG_USERNAME -d $PG_DBNAME
 
 	# 5. Test your Restoring
