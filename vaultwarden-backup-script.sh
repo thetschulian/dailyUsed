@@ -21,7 +21,7 @@ LOG_FILE="/var/log/vault_backup.log"
 MAX_LOG_SIZE=$((100 * 1024 * 1024))  # 100 MB
 
 echo "[$(date '+%F %T')] Starting backup..." >> "$LOG_FILE"
-
+sudo apt-get install nfs-common -y
 # === Ensure NFS share is mounted ===
 if ! mountpoint -q "$BACKUP_DIR"; then
     echo "[$(date '+%F %T')] NFS share not mounted. Attempting to mount..." >> "$LOG_FILE"
