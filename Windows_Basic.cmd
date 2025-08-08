@@ -31,7 +31,9 @@ winget uninstall "Copilot" --accept-source-agreements
 winget uninstall "Feedback Hub" --accept-source-agreements
 winget uninstall "Game Bar" --accept-source-agreements
 winget uninstall "Paint" --accept-source-agreements
+winget uninstall "Cortana" --accept-source-agreements
 winget uninstall "News" --accept-source-agreements
+winget uninstall "Movies & TV " --accept-source-agreements
 winget uninstall "Power Automate" --accept-source-agreements
 winget uninstall "Microsoft Bing" --accept-source-agreements
 winget uninstall "Microsoft Tips" --accept-source-agreements
@@ -58,6 +60,7 @@ winget uninstall "Get Help" --accept-source-agreements
 winget uninstall "Microsoft Edge Game Assist" --accept-source-agreements
 
 winget uninstall "Windows Maps" --accept-source-agreements
+winget uninstall "Windows Clock" --accept-source-agreements
 winget uninstall "Windows Sound Recorder" --accept-source-agreements
 winget uninstall "Outlook for Windows" --accept-source-agreements
 winget uninstall "Mail and Calendar" --accept-source-agreements
