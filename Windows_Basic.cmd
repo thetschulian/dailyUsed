@@ -1,5 +1,5 @@
 echo Download newest Version from Github
-powershell -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/thetschulian/dailyUsed/main/Windows_Basic.cmd' -OutFile 'Windows_Basic.cmd'"
+curl -O https://raw.githubusercontent.com/thetschulian/dailyUsed/main/Windows_Basic.cmd
 
 
 echo Win10 style rechtsklick
