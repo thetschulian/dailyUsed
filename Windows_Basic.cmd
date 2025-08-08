@@ -1,7 +1,7 @@
 echo Run this Script via CMD not via PS otherwise some bugs can occure
 pause
 echo Download newest Version from Github
-curl -O "Windows_Basic.cmd" "https://raw.githubusercontent.com/thetschulian/dailyUsed/main/Windows_Basic.cmd"
+curl -o "Windows_Basic.cmd" "https://raw.githubusercontent.com/thetschulian/dailyUsed/main/Windows_Basic.cmd"
 
 echo Win10 style rechtsklick
 echo enable Seconds on Taskbar Clock
