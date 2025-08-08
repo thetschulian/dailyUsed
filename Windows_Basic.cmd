@@ -23,7 +23,10 @@ REG ADD HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Search /f /v
 echo Show My Computer on Desktop
 REG ADD HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel /v "{20D04FE0-3AEA-1069-A2D8-08002B30309D}" /t REG_DWORD /d 0 /f
 echo Taskmaanger Default Register performance
-REG ADD HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\TaskManager /v StartUpTab /t REG_DWORD /d 1 /f
+REG ADD HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\TaskManager /f /v StartUpTab /t REG_DWORD /d 1 
+echo Add END TASK to Taskbar
+reg add HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\TaskbarDeveloperSettings /f /v TaskbarEndTask /t REG_DWORD /d 1 
+
 
 
 
@@ -92,3 +95,24 @@ schtasks /create /tn "daily_Kill_Tool" /tr "C:\Windows\System32\taskkill.exe /IM
 
 
 pause
+
+Echo disable monitor timeout, hibernate and standby (as admin)
+
+powercfg.exe -x -monitor-timeout-ac 0
+powercfg.exe -x -monitor-timeout-dc 0
+powercfg.exe -x -disk-timeout-ac 0
+powercfg.exe -x -disk-timeout-dc 0
+powercfg.exe -x -standby-timeout-ac 0
+powercfg.exe -x -standby-timeout-dc 0
+powercfg.exe -x -hibernate-timeout-ac 0
+powercfg.exe -x -hibernate-timeout-dc 0
+
+REM --- Disable hibernation and Fast Startup ---
+powercfg.exe /hibernate off
+
+REM --- Set lid close action to 'Do nothing' ---
+powercfg.exe /setacvalueindex SCHEME_CURRENT SUB_BUTTONS LIDACTION 0
+powercfg.exe /setdcvalueindex SCHEME_CURRENT SUB_BUTTONS LIDACTION 0
+
+REM --- Apply the changes ---
+powercfg.exe /S SCHEME_CURRENT
