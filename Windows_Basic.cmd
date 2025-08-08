@@ -49,8 +49,13 @@ winget list
 
 echo run as admin
 
+pause 
+
 Echo CPU Performance Boost (as Local ADMIN)
 	reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\54533251-82be-4824-96c1-47b60b740d00\be337238-0d82-4146-a960-4f3749d470c7" /v Attributes /t REG_DWORD /d 2 /f
 
-  Kill A Scheduled Task (as Local Admin)
+ echo  Kill A Scheduled Task (as Local Admin)
 schtasks /create /tn "daily_Kill_Tool" /tr "C:\Windows\System32\taskkill.exe /IM Tool.exe /F" /sc daily /st 20:00 /ru "SYSTEM"
+
+
+pause
