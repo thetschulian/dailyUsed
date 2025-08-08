@@ -76,6 +76,7 @@ winget uninstall "Windows Clock" --accept-source-agreements
 winget uninstall "Windows Sound Recorder" --accept-source-agreements
 winget uninstall "Outlook for Windows" --accept-source-agreements
 winget uninstall "Mail and Calendar" --accept-source-agreements
+winget uninstall "windows web experience pack" --accept-source-agreements
 
 winget list
 
