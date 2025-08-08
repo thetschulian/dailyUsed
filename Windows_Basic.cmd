@@ -1,3 +1,6 @@
+echo Download newest Version from Github
+Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/thetschulian/dailyUsed/main/Windows_Basic.cmd' -OutFile 'Windows_Basic.cmd'
+
 echo Win10 style rechtsklick
 echo enable Seconds on Taskbar Clock
 REG ADD HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /f /v ShowSecondsInSystemClock /t REG_DWORD /d 1
@@ -13,15 +16,15 @@ REG ADD HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Adv
 REG ADD HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /f /v MMTaskbarGlomLevel /t REG_DWORD /d 2
 REG ADD HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /f /v MMTaskbarMode /t REG_DWORD /d 2
 
-  Echo Disable SHARE Button on Taskbar Previews
-  	reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v TaskbarSn /t REG_DWORD /d 0 /f
+Echo Disable SHARE Button on Taskbar Previews
+reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v TaskbarSn /t REG_DWORD /d 0 /f
 
-Echo Install Powertoys
-rem 
+rem Echo Install Powertoys
+rem winget install Microsoft.PowerToys --source winget
 
-winget install Microsoft.PowerToys --source winget
 Echo Install Lenovo Commercial Vantage
 winget install "Lenovo Commercial Vantage" --source=msstore --accept-package-agreements --accept-source-agreements
+
 Echo debloat windows
 winget uninstall "Microsoft 365 Copilot" --accept-source-agreements
 winget uninstall "Feedback Hub" --accept-source-agreements
