@@ -1,5 +1,5 @@
 echo Download newest Version from Github
-curl -O https://raw.githubusercontent.com/thetschulian/dailyUsed/main/Windows_Basic.cmd
+curl -O Windows_Basic.cmd https://raw.githubusercontent.com/thetschulian/dailyUsed/main/Windows_Basic.cmd
 
 
 echo Win10 style rechtsklick
