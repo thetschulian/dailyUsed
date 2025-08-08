@@ -1,6 +1,7 @@
+echo Run this Script via CMD not via PS otherwise some bugs can occure
+pause
 echo Download newest Version from Github
 curl -O "Windows_Basic.cmd" "https://raw.githubusercontent.com/thetschulian/dailyUsed/main/Windows_Basic.cmd"
-
 
 echo Win10 style rechtsklick
 echo enable Seconds on Taskbar Clock
@@ -12,10 +13,12 @@ reg.exe add "HKCU\Software\Classes\CLSID\{d93ed569-3b3e-4bff-8355-3c44f6a52bb5}\
 echo Other Design Settings
 REG ADD HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /f /v LaunchTo /t REG_DWORD /d 1
 REG ADD HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /f /v TaskbarGlomLevel /t REG_DWORD /d 2
-REG ADD "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced " /f /v TaskbarGlomLevel /t REG_DWORD /d 2
 REG ADD HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /f /v MMTaskbarEnabled /t REG_DWORD /d 1
 REG ADD HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /f /v MMTaskbarGlomLevel /t REG_DWORD /d 2
 REG ADD HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /f /v MMTaskbarMode /t REG_DWORD /d 2
+echo Disable the Search Box
+REG ADD HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Search /f /v SearchBoxTaskbarMode /t REG_DWORD /d 0 
+
 
 Echo Disable SHARE Button on Taskbar Previews
 reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v TaskbarSn /t REG_DWORD /d 0 /f
