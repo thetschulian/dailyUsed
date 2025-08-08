@@ -1,5 +1,6 @@
 echo Download newest Version from Github
-Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/thetschulian/dailyUsed/main/Windows_Basic.cmd' -OutFile 'Windows_Basic.cmd'
+powershell -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/thetschulian/dailyUsed/main/Windows_Basic.cmd' -OutFile 'Windows_Basic.cmd'"
+
 
 echo Win10 style rechtsklick
 echo enable Seconds on Taskbar Clock
