@@ -6,21 +6,26 @@ A lightweight tool to convert any OTP (One-Time Password) QR code into plain tex
 
 - Decode OTP QR codes into readable secrets
 - Supports Google Authenticator exports
-- Easily migrate to other OTP tools like Bitwarden, Reiner SCT, etc.
+- Easily migrate to other OTP tools like Bitwarden, Reiner SCT, and more
 - Everything runs **locally** on your computer — no data is sent externally
 
 ## ⚠️ Disclaimer
 
-This tool is provided **as-is**, without any guarantees or warranties. While all processing is done locally on your machine, you are solely responsible for how you use the extracted data.
+This tool is provided **as-is**, without any guarantees or warranties. All processing is performed locally on your machine, and you are solely responsible for how you use the extracted data.
 
 > **Important Notes:**
-> - I am **not responsible** for any scripts, code snippets, or third-party components included or referenced in this project.
-> - Always **verify** that the newly generated OTP codes match the originals **before deleting** your existing authenticator entries — especially with Google Authenticator exports.
-> - Use this tool at your own risk. Misuse or incorrect handling of OTP secrets may result in loss of access to critical accounts.
+> - I am **not responsible** for any included scripts, JavaScript code, or third-party components referenced in this project.
+> - Always **verify** that the newly generated OTP codes match the originals **before deleting** your existing authenticator entries — especially when migrating from Google Authenticator.
+> - Use this tool at your own risk. Improper handling of OTP secrets may result in permanent loss of access to your accounts.
 
 ## 🛠️ Usage
 
-Simply scan or upload an OTP QR code and the tool will extract the secret key in plain text format. You can then import it into your preferred OTP manager.
+1. Download the repository.
+2. Open the `html` file in your browser.
+3. Upload an OTP QR code — the tool will extract the secret key in plain text format.
+4. Import the extracted secret into your preferred OTP manager.
+
+> If errors occur, try cropping the image so that only the QR code remains visible in the screenshot.
 
 ---
 
