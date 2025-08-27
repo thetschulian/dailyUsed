@@ -21,9 +21,9 @@ This tool is provided **as-is**, without any guarantees or warranties. All proce
 ## 🛠️ Usage
 
 1. Download the repository.
-2. Open the `html` file in your browser.
+2. Open the `index.html` file with your favourite browser.
 3. Upload an OTP QR code — the tool will extract the secret key in plain text format.
-4. Import the extracted secret into your preferred OTP manager.
+4. Optional: Import the extracted secret into your preferred OTP manager.
 
 > If errors occur, try cropping the image so that only the QR code remains visible in the screenshot.
 
