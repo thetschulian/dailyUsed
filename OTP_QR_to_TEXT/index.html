@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QR Code Generator and Decoder</title>
+
+  <!-- Local CSS -->
+  <link href="libs/bootstrap.min.css" rel="stylesheet"/>
+
+  <!-- Local JS Libraries -->
+  <script src="libs/qrcode.min.js"></script>
+  <script src="libs/jSQR.min.js"></script>
+  <script src="libs/protobuf.min.js"></script>
+</head>
+<body>
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <!-- QR Code Generator -->
+      <div class="col-md-6">
+        <h1 class="text-center">QR Code Generator</h1>
+        <div class="card shadow">
+          <div class="card-body">
+            <form id="qrForm">
+              <div class="mb-3">
+                <label for="urlInput" class="form-label">OTPAuth URL</label>
+                <textarea class="form-control" id="urlInput" rows="3" placeholder="Enter OTPAuth URL" required></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary w-100">Generate QR Code</button>
+            </form>
+            <div class="mt-4 text-center" id="qrcode"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- QR Code Decoder -->
+      <div class="col-md-6">
+        <h1 class="text-center">QR Code Decoder</h1>
+        <div class="card shadow">
+          <div class="card-body">
+            <h5 class="card-title">Upload QR Code</h5>
+            <p class="card-text">Upload an image of a QR code, and we'll decode the URL or text for you.</p>
+            <div class="mb-3">
+              <input type="file" id="qrInput" class="form-control" accept="image/*"/>
+            </div>
+            <div class="mt-4">
+              <h6>Decoded URL/Text:</h6>
+              <div id="decodedResult" class="alert alert-secondary">No QR code uploaded yet.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Base32 encoder
+    function toBase32(bytes) {
+      const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+      let bits = 0, value = 0, output = "";
+
+      for (let i = 0; i < bytes.length; i++) {
+        value = (value << 8) | bytes[i];
+        bits += 8;
+
+        while (bits >= 5) {
+          output += alphabet[(value >>> (bits - 5)) & 31];
+          bits -= 5;
+        }
+      }
+
+      if (bits > 0) {
+        output += alphabet[(value << (5 - bits)) & 31];
+      }
+
+      return output;
+    }
+
+    // QR Code Generator
+    document.getElementById("qrForm").addEventListener("submit", function(event) {
+      event.preventDefault();
+      const url = document.getElementById("urlInput").value.trim();
+      if (!url) {
+        alert("Please enter a valid URL");
+        return;
+      }
+      document.getElementById("qrcode").innerHTML = "";
+      new QRCode(document.getElementById("qrcode"), {
+        text: url,
+        width: 256,
+        height: 256,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+      });
+    });
+
+    // Google OTP Decoder
+    async function decodeGoogleOTP(rawUrl) {
+      const match = rawUrl.match(/otpauth-migration:\/\/offline\?data=([^&]+)/);
+      if (!match) return null;
+
+      const base64 = decodeURIComponent(match[1]);
+      const binary = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+
+      try {
+        const protoText = `
+          syntax = "proto3";
+          package otp;
+
+          message MigrationPayload {
+            repeated OTPParameters otpParameters = 1;
+          }
+
+          message OTPParameters {
+            bytes secret = 1;
+            string name = 2;
+            string issuer = 3;
+            int32 algorithm = 4;
+            int32 digits = 5;
+            int32 type = 6;
+            int32 counter = 7;
+            int32 period = 8;
+          }
+        `;
+
+        const root = protobuf.parse(protoText).root;
+        const MigrationPayload = root.lookupType("otp.MigrationPayload");
+        const message = MigrationPayload.decode(binary);
+        const accounts = message.otpParameters;
+
+        return accounts.map(account => {
+          const issuer = account.issuer || "";
+          const name = account.name || "";
+          const secret = toBase32(account.secret);
+          const algorithm = ["SHA1", "SHA256", "SHA512"][account.algorithm] || "SHA1";
+          const digits = account.digits || 6;
+          const period = account.period || 30;
+
+          return `otpauth://totp/${encodeURIComponent(issuer)}:${encodeURIComponent(name)}?secret=${secret}&issuer=${encodeURIComponent(issuer)}&algorithm=${algorithm}&digits=${digits}&period=${period}`;
+        });
+      } catch (error) {
+        console.error("Error decoding Google OTP migration data:", error);
+        throw error;
+      }
+    }
+
+    // QR Code Decoder
+    document.getElementById('qrInput').addEventListener('change', async function (event) {
+      const file = event.target.files[0];
+      if (!file) {
+        alert('Please upload an image!');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = async function (e) {
+        const img = new Image();
+        img.src = e.target.result;
+
+        img.onload = async function () {
+          const canvas = document.createElement('canvas');
+          const context = canvas.getContext('2d');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          context.drawImage(img, 0, 0);
+
+          const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+          const qrCodeResult = jsQR(imageData.data, canvas.width, canvas.height);
+          const output = document.getElementById('decodedResult');
+
+          if (qrCodeResult) {
+            const rawData = qrCodeResult.data;
+
+            if (rawData.startsWith("otpauth-migration://")) {
+              try {
+                const decoded = await decodeGoogleOTP(rawData);
+                output.innerHTML = decoded.map(url => `<code>${url}</code>`).join("<br>");
+              } catch (err) {
+                output.textContent = "Failed to decode Google OTP migration data.";
+              }
+            } else {
+              output.textContent = rawData;
+            }
+          } else {
+            output.textContent = 'Failed to decode QR code. Please try a different image.';
+          }
+        };
+      };
+
+      reader.readAsDataURL(file);
+    });
+  </script>
+</body>
+</html>
