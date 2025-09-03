@@ -9,3 +9,4 @@ sc.exe config "wuauserv" obj= ".\Gast" password= "fuckyouwindowsupdatehaha" #if 
 sc.exe config "wuauserv" obj= ".\Guest" password= "fuckyouwindowsupdatehaha" #if you have an English OS
 Restart-Service "wuauserv"
 Get-Service "wuauserv"
+Windows/archive/
