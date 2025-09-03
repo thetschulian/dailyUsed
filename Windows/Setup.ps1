@@ -1,4 +1,4 @@
-
+# Use Powershell for curl
 # Set Basic Windows Settings and debloat it
   curl -o "Windows-Usr-Basics.cmd" "https://raw.githubusercontent.com/thetschulian/dailyUsed/refs/heads/main/Windows/Windows-Usr-Basics.cmd"
 
