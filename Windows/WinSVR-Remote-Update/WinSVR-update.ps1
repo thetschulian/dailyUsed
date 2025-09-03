@@ -1,4 +1,6 @@
 #### THIS IS IN DEVELOPMENT STATUS
+### ONLY WORKS ON DOMAIN INFRASTRUCTURES
+########################################
 # Toggle read-only mode: 1 = report only, 0 = install updates and reboot
 $readonly = 1
 
