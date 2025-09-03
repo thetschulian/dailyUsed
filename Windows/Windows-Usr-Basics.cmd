@@ -1,6 +1,10 @@
 echo Run this in CMD only - powershell will cause errors
 pause
 
+mkdir C:\temp
+echo Download newest Version to C:\temp
+powershell -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/thetschulian/dailyUsed/main/Windows/Windows-Usr-Basics.cmd' -OutFile 'C:\temp\xyzWindows-Usr-Basics.cmd'"
+
 echo Win10 style rechtsklick
 echo enable Seconds on Taskbar Clock
 REG ADD HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /f /v ShowSecondsInSystemClock /t REG_DWORD /d 1
@@ -28,8 +32,6 @@ REG ADD HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\TaskManager 
 
 echo Add END TASK to Taskbar
 reg add HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\TaskbarDeveloperSettings /f /v TaskbarEndTask /t REG_DWORD /d 1 
-
-
 
 Echo Disable SHARE Button on Taskbar Previews
 reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v TaskbarSn /t REG_DWORD /d 0 /f
