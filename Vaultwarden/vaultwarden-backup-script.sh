@@ -1,5 +1,5 @@
 #!/bin/bash
-
+Vaultwarden/
 set -e
 
 # === Configuration ===
