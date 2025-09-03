@@ -87,8 +87,12 @@ echo run as admin
 
 pause 
 
-Echo CPU Performance Boost (as Local ADMIN)
+echo CPU Performance Boost (as Local ADMIN)
 	reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\54533251-82be-4824-96c1-47b60b740d00\be337238-0d82-4146-a960-4f3749d470c7" /v Attributes /t REG_DWORD /d 2 /f
+
+echo disable auto pair notifications of bluetooth devices
+   reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Bluetooth\SwiftPair" /v QuickPair /t REG_DWORD /d 0 /f
+
 
  echo  Kill A Scheduled Task (as Local Admin)
 schtasks /create /tn "daily_Kill_Tool" /tr "C:\Windows\System32\taskkill.exe /IM Tool.exe /F" /sc daily /st 20:00 /ru "SYSTEM"
@@ -96,7 +100,7 @@ schtasks /create /tn "daily_Kill_Tool" /tr "C:\Windows\System32\taskkill.exe /IM
 
 pause
 
-Echo disable monitor timeout, hibernate and standby as admin
+echo disable monitor timeout, hibernate and standby as admin
 
 powercfg.exe -x -monitor-timeout-ac 0
 powercfg.exe -x -monitor-timeout-dc 0
