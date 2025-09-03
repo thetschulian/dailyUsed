@@ -1,3 +1,5 @@
+@echo off
+echo %DATE% %TIME% Script started.
 echo Run this in CMD only - powershell will cause errors
 pause
 
@@ -85,40 +87,89 @@ winget uninstall "windows web experience pack" --accept-source-agreements
 
 winget list
 
-echo run as admin
+echo run as admin press any key to continue admin tasks
 
 pause 
 
-echo CPU Performance Boost (as Local ADMIN)
-	reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\54533251-82be-4824-96c1-47b60b740d00\be337238-0d82-4146-a960-4f3749d470c7" /v Attributes /t REG_DWORD /d 2 /f
+::::::START::::::::::::::::::::: CHECK FOR ADMIN PRIVILEGES
 
-echo disable auto pair notifications of bluetooth devices
-   reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Bluetooth\SwiftPair" /v QuickPair /t REG_DWORD /d 0 /f
+    NET SESSION >nul 2>&1
+    IF %ERRORLEVEL% EQU 0 (
+    
+	ECHO "Administrator PRIVILEGES Detected!"
+	echo this should be moved to a own script and run elevated. 
+	echo Launching admin tasks...
+	echo powershell -Command "Start-Process 'C:\temp\Windows-Admin-Tasks.cmd' -Verb RunAs"
+
+		echo CPU Performance Boost (as Local ADMIN)
+			reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\54533251-82be-4824-96c1-47b60b740d00\be337238-0d82-4146-a960-4f3749d470c7" /v Attributes /t REG_DWORD /d 2 /f
+		
+		echo disable auto pair notifications of bluetooth devices
+		   reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Bluetooth\SwiftPair" /v QuickPair /t REG_DWORD /d 0 /f
+		
+		
+		 echo  Kill A Scheduled Task (as Local Admin)
+		schtasks /create /tn "daily_Kill_Tool" /tr "C:\Windows\System32\taskkill.exe /IM Tool.exe /F" /sc daily /st 20:00 /ru "SYSTEM"
+		
+		
+		echo disable monitor timeout, hibernate and standby as admin
+		
+		powercfg.exe -x -monitor-timeout-ac 0
+		powercfg.exe -x -monitor-timeout-dc 0
+		powercfg.exe -x -disk-timeout-ac 0
+		powercfg.exe -x -disk-timeout-dc 0
+		powercfg.exe -x -standby-timeout-ac 0
+		powercfg.exe -x -standby-timeout-dc 0
+		powercfg.exe -x -hibernate-timeout-ac 0
+		powercfg.exe -x -hibernate-timeout-dc 0
+		
+		REM --- Disable hibernation and Fast Startup ---
+		powercfg.exe /hibernate off
+		
+		REM --- Set lid close action to 'Do nothing' ---
+		powercfg.exe /setacvalueindex SCHEME_CURRENT SUB_BUTTONS LIDACTION 0
+		powercfg.exe /setdcvalueindex SCHEME_CURRENT SUB_BUTTONS LIDACTION 0
+		
+		REM --- Apply the changes ---
+		powercfg.exe /S SCHEME_CURRENT
 
 
- echo  Kill A Scheduled Task (as Local Admin)
-schtasks /create /tn "daily_Kill_Tool" /tr "C:\Windows\System32\taskkill.exe /IM Tool.exe /F" /sc daily /st 20:00 /ru "SYSTEM"
+    ) ELSE (
+        ECHO "NOT AN ADMIN"
+		echo creating the admin script now
+
+		rem Create the admin script dynamically
+		set "adminScript=%TEMP%\Windows-Admin-Tasks.cmd"
+		echo @echo off > "%adminScript%"
+		echo echo Running elevated tasks... >> "%adminScript%"
+		echo reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\54533251-82be-4824-96c1-47b60b740d00\be337238-0d82-4146-a960-4f3749d470c7" /v Attributes /t REG_DWORD /d 2 /f >> "%adminScript%"
+		echo reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Bluetooth\SwiftPair" /v QuickPair /t REG_DWORD /d 0 /f >> "%adminScript%"
+		echo schtasks /create /tn "daily_Kill_Tool" /tr "C:\Windows\System32\taskkill.exe /IM Tool.exe /F" /sc daily /st 20:00 /ru "SYSTEM" >> "%adminScript%"
+		echo powercfg.exe -x -monitor-timeout-ac 0 >> "%adminScript%"
+		echo powercfg.exe -x -monitor-timeout-dc 0 >> "%adminScript%"
+		echo powercfg.exe -x -disk-timeout-ac 0 >> "%adminScript%"
+		echo powercfg.exe -x -disk-timeout-dc 0 >> "%adminScript%"
+		echo powercfg.exe -x -standby-timeout-ac 0 >> "%adminScript%"
+		echo powercfg.exe -x -standby-timeout-dc 0 >> "%adminScript%"
+		echo powercfg.exe -x -hibernate-timeout-ac 0 >> "%adminScript%"
+		echo powercfg.exe -x -hibernate-timeout-dc 0 >> "%adminScript%"
+		echo powercfg.exe /hibernate off >> "%adminScript%"
+		echo powercfg.exe /setacvalueindex SCHEME_CURRENT SUB_BUTTONS LIDACTION 0 >> "%adminScript%"
+		echo powercfg.exe /setdcvalueindex SCHEME_CURRENT SUB_BUTTONS LIDACTION 0 >> "%adminScript%"
+		echo powercfg.exe /S SCHEME_CURRENT >> "%adminScript%"
+		
+		rem Launch the admin script with elevation
+		powershell -Command "Start-Process '%TEMP%\Windows-Admin-Tasks.cmd' -Verb RunAs"
+
 
 
 pause
+    )
+echo.
+echo.
+::::::END::::::::::::::::::::: CHECK FOR ADMIN PRIVILEGES
 
-echo disable monitor timeout, hibernate and standby as admin
 
-powercfg.exe -x -monitor-timeout-ac 0
-powercfg.exe -x -monitor-timeout-dc 0
-powercfg.exe -x -disk-timeout-ac 0
-powercfg.exe -x -disk-timeout-dc 0
-powercfg.exe -x -standby-timeout-ac 0
-powercfg.exe -x -standby-timeout-dc 0
-powercfg.exe -x -hibernate-timeout-ac 0
-powercfg.exe -x -hibernate-timeout-dc 0
 
-REM --- Disable hibernation and Fast Startup ---
-powercfg.exe /hibernate off
 
-REM --- Set lid close action to 'Do nothing' ---
-powercfg.exe /setacvalueindex SCHEME_CURRENT SUB_BUTTONS LIDACTION 0
-powercfg.exe /setdcvalueindex SCHEME_CURRENT SUB_BUTTONS LIDACTION 0
 
-REM --- Apply the changes ---
-powercfg.exe /S SCHEME_CURRENT
