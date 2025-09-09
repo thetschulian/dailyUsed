@@ -24,7 +24,9 @@
             <form id="qrForm">
               <div class="mb-3">
                 <label for="urlInput" class="form-label">OTPAuth URL</label>
-                <textarea class="form-control" id="urlInput" rows="3" placeholder="Enter OTPAuth URL" required></textarea>
+                <textarea class="form-control" id="urlInput" rows="3" required>
+                  otpauth://totp/#Headline#:#User@domain.de#?secret=#SECRET#&issuer=#ISSUERNAME#
+                </textarea>
               </div>
               <button type="submit" class="btn btn-primary w-100">Generate QR Code</button>
             </form>
@@ -193,3 +195,4 @@
   </script>
 </body>
 </html>
+
