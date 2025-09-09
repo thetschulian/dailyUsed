@@ -9,7 +9,7 @@ A lightweight tool to convert any OTP (One-Time Password) QR code into plain tex
 - Easily migrate to other OTP tools like Bitwarden, Reiner SCT, and more
 - Everything runs **locally** on your computer — no data is sent externally
 
-  ## 🛠️ Usage
+## 🛠️ Usage
 
 1. Download the repository.
 2. Open the `index.html` file with your favourite browser.
@@ -26,8 +26,6 @@ This tool is provided **as-is**, without any guarantees or warranties. All proce
 > - I am **not responsible** for any included scripts, JavaScript code, or third-party components referenced in this project.
 > - Always **verify** that the newly generated OTP codes match the originals **before deleting** your existing authenticator entries — especially when migrating from Google Authenticator.
 > - Use this tool at your own risk. Improper handling of OTP secrets may result in permanent loss of access to your accounts.
-
-
 
 ---
 
