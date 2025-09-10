@@ -1,12 +1,10 @@
-echo ##### Install Lenovo Think Pad Power Manager on UNIX
+echo ##### Install Lenovo ThinkPad Power Manager on UNIX
 sudo apt update -y
 sudo apt install tlp tlp-rdw -y
 
+echo ##### Starting the Services
 sudo systemctl enable tlp --now
 sudo systemctl start tlp
-
-
-
 
 echo ##### Checking if Battery is supported / found
 sudo tlp-stat 
