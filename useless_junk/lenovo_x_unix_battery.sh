@@ -19,3 +19,13 @@ sudo systemctl restart tlp
 
 echo ##### Check Battery-Level
 /etc/update-motd.d/10-battery
+
+echo ##### Disable Hibernate/Sleep/Standby by closing LID
+echo Uncomment this Line: HandleLidSwitch=ignore
+echo Uncomment this Line: HandleLidSwitchDocked=ignore
+echo Uncomment this Line: HandleLidSwitchExternalPower=ignore
+
+sudo nano /etc/systemd/logind.conf
+
+sudo systemctl restart systemd-logind
+
