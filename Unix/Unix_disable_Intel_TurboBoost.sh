@@ -17,3 +17,23 @@ else
 fi
 
 echo "✅ Done."
+
+nano /etc/systemd/system/disable-turbo.service
+###### Content Start 
+
+[Unit]
+Description=Disable Intel Turbo Boost
+After=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash -c 'echo 1 > /sys/devices/system/cpu/intel_pstate/no_turbo'
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+
+###### Content END 
+
+sudo systemctl daemon-reexec
+sudo systemctl enable disable-turbo.service
