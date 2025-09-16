@@ -17,6 +17,8 @@ echo # Uncomment this Line: START_CHARGE_THRESH_BAT0=80
 echo # Uncomment this Line: STOP_CHARGE_THRESH_BAT0=85
 echo # Uncomment this Line: RESTORE_THRESHOLDS_ON_BAT=1
 
+more /etc/tlp.conf | grep "THRESH"
+
 sudo nano /etc/tlp.conf
 sudo systemctl restart tlp
 
