@@ -15,6 +15,7 @@ sudo tlp-stat
 echo ##### Editing the Config /etc/tlp.conf
 echo # Uncomment this Line: START_CHARGE_THRESH_BAT0=80 
 echo # Uncomment this Line: STOP_CHARGE_THRESH_BAT0=85
+echo # Uncomment this Line: RESTORE_THRESHOLDS_ON_BAT=1
 
 sudo nano /etc/tlp.conf
 sudo systemctl restart tlp
