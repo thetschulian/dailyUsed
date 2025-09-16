@@ -37,3 +37,7 @@ WantedBy=multi-user.target
 
 sudo systemctl daemon-reexec
 sudo systemctl enable disable-turbo.service
+
+# Check the Clocking
+watch -n 1 "grep MHz /proc/cpuinfo"
+
