@@ -36,3 +36,17 @@ sudo systemctl restart systemd-logind
 
 #### Or on Debian / Proxmox etc
 cat /sys/class/power_supply/BAT0/capacity && cat /sys/class/power_supply/BAT0/status
+
+## TODO  16.09.2025
+echo A cronjob that runs this script to avoid micro charging at 85% 
+
+## Start content of Anti-Micro-Charging Script
+#!/bin/bash
+BAT_LEVEL=$(cat /sys/class/power_supply/BAT0/capacity)
+
+if [ "$BAT_LEVEL" -ge 85 ]; then
+  echo inhibit-charge > /sys/class/power_supply/BAT0/charge_behaviour
+elif [ "$BAT_LEVEL" -le 80 ]; then
+  echo auto > /sys/class/power_supply/BAT0/charge_behaviour
+fi
+## END content of Anti-Micro-Charging Script
