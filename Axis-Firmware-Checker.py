@@ -1,4 +1,4 @@
-### Script that checks the Axis.com Camera Website for Firmwares
+### Script that checks the Axis.com Camera Website for Firmware.
 
 
 import requests
