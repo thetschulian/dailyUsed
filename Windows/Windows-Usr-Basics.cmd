@@ -50,7 +50,7 @@ winget uninstall "Microsoft 365 Copilot" --accept-source-agreements
 winget uninstall "Copilot" --accept-source-agreements
 winget uninstall "Feedback Hub" --accept-source-agreements
 winget uninstall "Game Bar" --accept-source-agreements
-winget uninstall "Paint" --accept-source-agreements
+::winget uninstall "Paint" --accept-source-agreements
 winget uninstall "Cortana" --accept-source-agreements
 winget uninstall "News" --accept-source-agreements
 winget uninstall "Movies & TV " --accept-source-agreements
