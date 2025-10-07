@@ -6,7 +6,7 @@ pause
 
 mkdir C:\temp
 echo Download newest Version to C:\temp
-powershell -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/thetschulian/dailyUsed/main/Windows/Windows-Usr-Basics.cmd' -OutFile 'C:\temp\xyzWindows-Usr-Basics.cmd'"
+powershell -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/thetschulian/dailyUsed/main/Windows/Windows-Usr-Basics.cmd' -OutFile 'C:\temp\Windows-Usr-Basics.cmd'"
 
 echo Win10 style rechtsklick
 echo enable Seconds on Taskbar Clock
