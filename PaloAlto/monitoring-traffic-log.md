@@ -16,11 +16,12 @@
 ## 🔍 IP-Filter
 
 ```text
-addr.src in '192.168.0.10' and addr.dst in '192.168.1.20'
-→ Zeigt alle Verbindungen von Quelle 192.168.0.10 zu Ziel 192.168.1.20
 
 addr in '192.168.2.123'
 → Zeigt alle eingehenden und ausgehenden Verbindungen dieser IP
+
+addr in '192.168.2.123/24'
+→ Zeigt alle eingehenden und ausgehenden Verbindungen des 192.168.2.0er Subnetzes
 
 addr.src in '192.168.2.0/24'
 → Zeigt alle Verbindungen aus dem 192.168.2.0er Netz
@@ -28,6 +29,8 @@ addr.src in '192.168.2.0/24'
 addr.dst in '192.168.0.0/16'
 → Zeigt alle Verbindungen zu Zielen im 192.168.x.x Netz
 
+addr.src in '192.168.0.10' and addr.dst in '192.168.1.20'
+→ Zeigt alle Verbindungen von Quelle 192.168.0.10 zu Ziel 192.168.1.20
 
 ```
 ## 🌐 Port- und Protokollfilter
