@@ -30,11 +30,12 @@ test vpn ipsec-sa tunnel <tunnelname:proxyid>
 ```bash
 ping host 1.1.1.1
 ```
-   -> pings 1.1.1.1 from the mgmt interface
+-> pings 1.1.1.1 from the mgmt interface
+   
 ```bash
 ping source y.y.y.y host 1.1.1.1
 ```
-    -> the source y.y.y.y needs to match an existing Firewalls Interface IP or Mangement Interface IP to ping 1.1.1.1
+-> the source y.y.y.y needs to match an existing Firewalls Interface IP or Mangement Interface IP to ping 1.1.1.1
 
 
 # ⚙️ Other Useful CLI Commands
