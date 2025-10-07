@@ -29,17 +29,17 @@ test vpn ipsec-sa tunnel #tunnelname:proxyid#
 # 📶 Ping from Firewall
 ```bash
 ping host 1.1.1.1 
--> pings from the mgmt interface
+   -> pings 1.1.1.1 from the mgmt interface
 
 ping source y.y.y.y host 1.1.1.1
--> y.y.y.y *needs to match* an existing Firewalls Interface IP or Mangement Interface IP
+    -> the source y.y.y.y needs to match an existing Firewalls Interface IP or Mangement Interface IP to ping 1.1.1.1
 ```
 
 # ⚙️ Other Useful CLI Commands
 ```bash
 
 
-Set cli pager off
-Set cli config-output-format set 
+set cli pager off
+set cli config-output-format set 
 -> this sets the CLI Output to "set" so you can use the commands as a documentation for example
 ```
