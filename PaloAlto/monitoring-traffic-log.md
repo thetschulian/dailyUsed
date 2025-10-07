@@ -9,6 +9,7 @@
     (addr.src in '192.168.0.10' and port.dst eq 443) or (addr.dst in '192.168.1.20' and port.dst eq 80)
     ```
     → Zeigt HTTPS von 192.168.0.10 **oder** HTTP zu 192.168.1.20
+- Hinweis: Wenn keine Subnetzmaske angegeben ist, wird automatisch /32 angenommen
 
 ---
 
