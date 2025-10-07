@@ -2,10 +2,11 @@
 
 ```bash
 configure
+# Superuser / Admin
 set mgt-config users username-adm password     #ENTER to enter password#
 set mgt-config users username-adm permissions role-based superuser yes
 set mgt-config users username-adm password-profile #your-predefined-passwordprofile#
-
+# Superreader / Readonly-Admin
 set mgt-config users username-ro password     #ENTER to enter password# 
 set mgt-config users username-ro permissions role-based superreader yes
 set mgt-config users username-ro password-profile #your-predefined-passwordprofile#
