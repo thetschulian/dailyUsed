@@ -93,3 +93,16 @@ set cli config-output-format set
 ```
    -> this sets the CLI Output to "set" so you can use the commands as a documentation 
 
+---
+
+The needed Infos about Objects are named in this Markdown which is going to be used to create a webapp (html/js) for Palo Alto.
+I should be able to enter a list of IPs or FQDNs and a "destination"  address group as a single field. 
+The Name of the FQDN object should contain the Domain by default, add another textbox for the alternate name which is nevertheless needed for IP objects as a prefix. lets assum in that case the prefix for those iPs should be AV-Server
+Example 192.168.0.1 should get the name S_AV-Server_192.168.0.1
+Example google.com should get the Name S_google.com as long as the alternate name field is empty. if its set the name should look like S_AV-Server_google.com
+
+
+And be carefull, any of the objectname (address or address group) should NEVER exceed 62 characters due to palo character limits.
+Always think about the Prefixes S_ and S_HG_ 
+
+The output should be rendered in realtime so if i change something in my list or the prefix fields the set commands created by that app will automatically being updated i think its possible with java script
