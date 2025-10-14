@@ -2,10 +2,12 @@
 
 ```bash
 configure
+# Create a Superuser (Admin)
 set mgt-config users username-adm password     <press ENTER to enter password>
 set mgt-config users username-adm permissions role-based superuser yes
 set mgt-config users username-adm password-profile <your-predefined-passwordprofile>
 
+# Create a Superreader (Readonly Admin)
 set mgt-config users username-ro password     <press ENTER to enter password>
 set mgt-config users username-ro permissions role-based superreader yes
 set mgt-config users username-ro password-profile <your-predefined-passwordprofile>
@@ -22,7 +24,6 @@ set template <your-firewall-name> config deviceconfig system service disable-snm
 and enable https, ssh and ping for those
 ```bash
 configure
-set template <your-firewall-name> config  network interface aggregate-ethernet ae1 layer3 units ae1.655 interface-management-profile Outside_Management
 
 set template <your-firewall-name> config  network profiles interface-management-profile Outside_Management permitted-ip 62.1.2.3/27
 set template <your-firewall-name> config  network profiles interface-management-profile Outside_Management permitted-ip 62.2.2.236/32
@@ -30,6 +31,10 @@ set template <your-firewall-name> config  network profiles interface-management-
 set template <your-firewall-name> config  network profiles interface-management-profile Outside_Management https yes
 set template <your-firewall-name> config  network profiles interface-management-profile Outside_Management ssh yes
 set template <your-firewall-name> config  network profiles interface-management-profile Outside_Management ping yes
+
+# Now attach the Profile to your desired interface
+set template <your-firewall-name> config  network interface aggregate-ethernet ae1 layer3 units ae1.655 interface-management-profile Outside_Management
+
 
 
 ```
