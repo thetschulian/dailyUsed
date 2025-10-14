@@ -18,6 +18,21 @@ set template <your-firewall-name> config deviceconfig system snmp-setting access
 set template <your-firewall-name> config deviceconfig system service disable-snmp no
 ```
 
+# 📡 Configure (external) Management Profile for Permitted IP
+```bash
+configure
+set template <your-firewall-name> config  network interface aggregate-ethernet ae1 layer3 units ae1.655 interface-management-profile Outside_Management
+
+set template <your-firewall-name> config  network profiles interface-management-profile Outside_Management permitted-ip 62.1.2.3/27
+set template <your-firewall-name> config  network profiles interface-management-profile Outside_Management permitted-ip 62.2.2.236/32
+set template <your-firewall-name> config  network profiles interface-management-profile Outside_Management permitted-ip 212.1.2.3/28
+set template <your-firewall-name> config  network profiles interface-management-profile Outside_Management https yes
+set template <your-firewall-name> config  network profiles interface-management-profile Outside_Management ssh yes
+set template <your-firewall-name> config  network profiles interface-management-profile Outside_Management ping yes
+
+
+```
+
 
 # 🔁 Test Site-to-Site VPN Connections
 ```bash
@@ -36,6 +51,7 @@ ping host 1.1.1.1
 ping source y.y.y.y host 1.1.1.1
 ```
 -> the source y.y.y.y needs to match an existing Firewalls Interface IP or Mangement Interface IP to ping 1.1.1.1
+
 
 
 # ⚙️ Other Useful CLI Commands
