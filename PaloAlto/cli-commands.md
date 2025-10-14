@@ -58,7 +58,32 @@ ping source y.y.y.y host 1.1.1.1
 ```
 -> the source y.y.y.y needs to match an existing Firewalls Interface IP or Mangement Interface IP to ping 1.1.1.1
 
+# Create Objects
 
+```bash
+
+   #Create Object - Tag
+   set shared tag S_TagName color color32
+   set shared tag S_TagName comments "description for the tag"
+   
+   #Create Object - Single HOST FQDN
+   set shared address S_PC-CTX-IT26 fqdn PC-CTX-IT26.domain.de
+   set shared address S_PC-CTX-IT26 description "Name of Mainuser or Admin"
+   set shared address S_PC-CTX-IT26 tag S_TagName
+   
+   #Create Object - Single HOST IP-Address
+   set shared address S_svr-rproxy10 ip-netmask 192.168.1.2/32
+   set shared address S_svr-rproxy10 description "Reverse Proxy Node 1"
+   set shared address S_svr-rproxy10 tag S_TagName
+   
+   
+   #Create Object - Fill a Hostgroup/Addressgroup with Address Objects
+   set shared address-group S_HG_AddressGroupNAME static [ S_PC-CTX-IT24 S_PC-CTX-IT26 ]
+   set shared address-group S_HG_AddressGroupNAME description "Hostgroup for example "
+   set shared address-group S_HG_AddressGroupNAME tag S_TagName
+```
+> Prefix S_ means its a shared object which all firewalls which are connected to panorama can use
+> HG means HostGroup and should be used to make a difference between single address objects and address group objects!! 
 
 # ⚙️ Other Useful CLI Commands
 ```bash
