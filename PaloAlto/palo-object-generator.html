@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Palo Alto Object Generator</title>
+  <style>
+    body { font-family: monospace; padding: 20px; background: #f4f4f4; }
+    textarea, input { width: 100%; margin: 10px 0; padding: 8px; font-family: monospace; }
+    .output { white-space: pre-wrap; background: #fff; padding: 10px; border: 1px solid #ccc; }
+  </style>
+</head>
+<body>
+
+<h2>🔧 Palo Alto Object Generator</h2>
+
+<label>Destination Address Group Name (without prefix):</label>
+<input type="text" id="groupName" placeholder="e.g. AV-Servers">
+
+<label>Alternate Name Prefix (optional, used for IPs and FQDNs):</label>
+<input type="text" id="altPrefix" placeholder="e.g. AV-Server">
+
+<label>List of IPs or FQDNs (one per line):</label>
+<textarea id="inputList" rows="10" placeholder="192.168.0.1\ngoogle.com"></textarea>
+
+<div class="output" id="outputBox"></div>
+
+<script>
+function sanitizeName(name) {
+  return name.replace(/[^a-zA-Z0-9_.-]/g, "_");
+}
+
+function generateCommands() {
+  const groupName = document.getElementById("groupName").value.trim();
+  const altPrefix = document.getElementById("altPrefix").value.trim();
+  const inputList = document.getElementById("inputList").value.trim().split("\n").filter(Boolean);
+
+  const tagName = "S_Tag_" + sanitizeName(groupName);
+  const groupFullName = "S_HG_" + sanitizeName(groupName).slice(0, 58); // 62-char limit minus prefix
+  const addressObjects = [];
+  const commands = [];
+
+  commands.push("configure");
+  commands.push(`set shared tag ${tagName} color color32`);
+  commands.push(`set shared tag ${tagName} comments "Auto-generated tag for ${groupName}"`);
+
+  inputList.forEach(entry => {
+    const isIP = /^\d{1,3}(\.\d{1,3}){3}(\/\d{1,2})?$/.test(entry);
+    const baseName = sanitizeName(entry);
+    const prefix = altPrefix ? sanitizeName(altPrefix) : baseName;
+    let objectName = "S_" + prefix + "_" + baseName;
+
+    if (!isIP && !altPrefix) objectName = "S_" + baseName;
+    else if (!isIP && altPrefix) objectName = "S_" + prefix + "_" + baseName;
+
+    objectName = objectName.slice(0, 62); // enforce Palo Alto name limit
+    addressObjects.push(objectName);
+
+    if (isIP) {
+      commands.push(`set shared address ${objectName} ip-netmask ${entry}`);
+      commands.push(`set shared address ${objectName} description "${prefix}"`);
+    } else {
+      commands.push(`set shared address ${objectName} fqdn ${entry}`);
+      commands.push(`set shared address ${objectName} description "${prefix}"`);
+    }
+
+    commands.push(`set shared address ${objectName} tag ${tagName}`);
+  });
+
+  commands.push(`set shared address-group ${groupFullName} static [ ${addressObjects.join(" ")} ]`);
+  commands.push(`set shared address-group ${groupFullName} description "Auto-generated group for ${groupName}"`);
+  commands.push(`set shared address-group ${groupFullName} tag ${tagName}`);
+
+  document.getElementById("outputBox").textContent = commands.join("\n");
+}
+
+document.getElementById("groupName").addEventListener("input", generateCommands);
+document.getElementById("altPrefix").addEventListener("input", generateCommands);
+document.getElementById("inputList").addEventListener("input", generateCommands);
+</script>
+
+</body>
+</html>
