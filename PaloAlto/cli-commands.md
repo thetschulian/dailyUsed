@@ -19,7 +19,7 @@ set template <your-firewall-name> config deviceconfig system service disable-snm
 ```
 
 # 📡 Configure (external) Management Profile for Permitted IP
-> and enable https, ssh and ping for those
+and enable https, ssh and ping for those
 ```bash
 configure
 set template <your-firewall-name> config  network interface aggregate-ethernet ae1 layer3 units ae1.655 interface-management-profile Outside_Management
