@@ -87,7 +87,7 @@ set shared address-group S_HG_AddressGroupNAME tag S_TagName
 > HG means HostGroup and should be used to make a difference between single address objects and address group objects!! 
 
 
-# ↩️ Recover  Devices to Panorama
+# ↩️ Recover Devices | Panorama
 
 
 1. Start on your Panorama 
