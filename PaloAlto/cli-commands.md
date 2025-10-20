@@ -58,7 +58,7 @@ ping source y.y.y.y host 1.1.1.1
 ```
 -> the source y.y.y.y needs to match an existing Firewalls Interface IP or Mangement Interface IP to ping 1.1.1.1
 
-# Create Objects
+# 🥑 Create Objects
 
 ```bash
 
@@ -86,7 +86,8 @@ set shared address-group S_HG_AddressGroupNAME tag S_TagName
 > Prefix S_ means its a shared object which all firewalls which are connected to panorama can use
 > HG means HostGroup and should be used to make a difference between single address objects and address group objects!! 
 
-# ⚙️ Recover  Devices to Panorama
+
+# ↩️ Recover  Devices to Panorama
 
 
 1. Start on your Panorama 
