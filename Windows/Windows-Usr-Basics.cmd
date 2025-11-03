@@ -142,9 +142,9 @@ pause
 		set KMSServer=kms.digiboy.ir
 		
 		REM ### Generic Keys ###
-		set win10EnterpriseKey=XGVPP-NMH47-7TTHJ-W3FW7-8HV2C
-		set win10ProKey=VK7JG-NPHTM-C97JM-9MPGT-3V66T
-		set win10HomeKey=YTMG3-N6DKC-DKB77-7M9GH-8HVX7
+		set win10EnterpriseKey=NPPR9-FWDCX-D2C8J-H872K-2YT43
+		set win10ProKey=W269N-WFGWX-YVC9B-4J6C9-T83GX
+		set win10HomeKey=TX9XD-98N7V-6WMQ6-BX7FG-H8Q99
 		
 		echo slmgr //b /upk
 		slmgr //b /upk
