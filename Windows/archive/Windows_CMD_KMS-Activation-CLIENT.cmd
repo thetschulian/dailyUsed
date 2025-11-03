@@ -67,10 +67,13 @@ echo slmgr //b /ato
 slmgr //b /ato
 
 echo Ich habe fertig.
-
+goto dasEnde
 
 
 :errorHandler
 echo Falsche Nummer ausgewählt beginne von vorne...
 pause
 goto kmsLoop
+
+:dasEnde
+echo bye
