@@ -5,9 +5,9 @@ REM ### KMS Server for Activation ###
 set KMSServer=kms.digiboy.ir
 
 REM ### Generic Keys ###
-set win10EnterpriseKey=NPPR9-FWDCX-D2C8J-H872K-2YT43
+set win10EnterpriseKey=XGVPP-NMH47-7TTHJ-W3FW7-8HV2C
 set win10ProKey=VK7JG-NPHTM-C97JM-9MPGT-3V66T
-set win10HomeKey=YTMG3-N6DKC-DKB77-7M9GH-8HVX
+set win10HomeKey=YTMG3-N6DKC-DKB77-7M9GH-8HVX7
 
 echo slmgr //b /upk
 slmgr //b /upk
@@ -27,9 +27,9 @@ slmgr //b /skms localhost
 echo =========================================
 echo.
 echo   Verwendeter KMS Server: %KMSServer%
-echo   [1] Win Enterprise
-echo   [2] Win Pro
-echo   [3] Win Home
+echo   [1] Win11 Enterprise
+echo   [2] Win11 Pro
+echo   [3] Win11 Home
 echo.
 
 SET ASW=0
