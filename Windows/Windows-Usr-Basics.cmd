@@ -179,17 +179,17 @@ pause
 		goto errorHandler
 		
 		:winEnterprise
-		echo Activating Win10 Enterprise - %win10EnterpriseKey%
+		echo Activating Win11 Enterprise - %win10EnterpriseKey%
 		slmgr //b /ipk %win10EnterpriseKey% 
 		goto continueKMS
 		
 		:winPro
-		echo Activating Win10 Pro - %win10ProKey%
+		echo Activating Win11 Pro - %win10ProKey%
 		slmgr //b /ipk %win10ProKey%
 		goto continueKMS
 		
 		:winHome
-		echo Activating Win10 Home - %win10HomeKey%
+		echo Activating Win11 Home - %win10HomeKey%
 		slmgr //b /ipk %win10HomeKey%
 		goto continueKMS
 		
