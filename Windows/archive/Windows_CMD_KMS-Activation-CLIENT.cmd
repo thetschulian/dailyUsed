@@ -67,9 +67,8 @@ echo slmgr //b /ato
 slmgr //b /ato
 
 echo Ich habe fertig.
-echo Fenster wird in 5 Sekunden geschlossen
-timeout 5
-exit
+
+
 
 :errorHandler
 echo Falsche Nummer ausgewählt beginne von vorne...
