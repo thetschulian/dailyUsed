@@ -7,6 +7,9 @@ pause
 mkdir C:\temp
 echo Download newest Version to C:\temp
 powershell -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/thetschulian/dailyUsed/main/Windows/Windows-Usr-Basics.cmd' -OutFile 'C:\temp\Windows-Usr-Basics.cmd'"
+echo Download  Teamviewer Quicksupport to C-temp
+powershell -Command "Invoke-WebRequest -Uri 'https://dl.teamviewer.com/download/TeamViewerQS.exe' -OutFile 'C:\temp\TeamviewerQS.exe'"
+
 
 echo Win10 style rechtsklick
 echo enable Seconds on Taskbar Clock
@@ -53,6 +56,9 @@ winget uninstall "Game Bar" --accept-source-agreements
 ::winget uninstall "Paint" --accept-source-agreements
 winget uninstall "Cortana" --accept-source-agreements
 winget uninstall "News" --accept-source-agreements
+winget uninstall "Microsoft News" --accept-source-agreements
+winget uninstall "Microsoft Teams" --accept-source-agreements
+winget uninstall "Microsoft 365 (Office)" --accept-source-agreements
 winget uninstall "Movies & TV " --accept-source-agreements
 winget uninstall "Power Automate" --accept-source-agreements
 winget uninstall "Microsoft Bing" --accept-source-agreements
