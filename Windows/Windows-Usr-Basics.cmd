@@ -71,6 +71,7 @@ winget uninstall "Microsoft Clipchamp" --accept-source-agreements
 winget uninstall "Phone Link" --accept-source-agreements
 winget uninstall "Smartphone Link" --accept-source-agreements
 winget uninstall "Windows Media Player" --accept-source-agreements
+winget uninstall "Outlook for Windows" --accept-source-agreements
 winget uninstall "Microsoft To Do" --accept-source-agreements
 winget uninstall "Solitaire & Casual Games" --accept-source-agreements
 winget uninstall "MSN Weather" --accept-source-agreements
