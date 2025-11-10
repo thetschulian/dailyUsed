@@ -12,10 +12,10 @@ mkdir %basicTempDir%
 echo "Download newest Version to %basicTempDir%"
 powershell -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/thetschulian/dailyUsed/main/Windows/Windows-Usr-Basics.cmd' -OutFile '%basicTempDir%\Windows-Usr-Basics.cmd'"
 
-echo "Download  Teamviewer Quicksupport to %basicTempDir%"
+echo "Download Teamviewer Quicksupport to %basicTempDir%"
 powershell -Command "Start-BitsTransfer -Source 'https://dl.teamviewer.com/download/TeamViewerQS.exe' -Destination '%basicTempDir%\TeamviewerQS.exe'"
 
-
+echo. 
 echo Win10 style rechtsklick
 echo enable Seconds on Taskbar Clock
 REG ADD HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /f /v ShowSecondsInSystemClock /t REG_DWORD /d 1
@@ -23,38 +23,39 @@ echo disable win11 contect menu quasi das weitere optionen beim rechtsklicken
 reg.exe add "HKCU\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32" /f /ve
 echo disable win11 explorer command bar 
 reg.exe add "HKCU\Software\Classes\CLSID\{d93ed569-3b3e-4bff-8355-3c44f6a52bb5}\InprocServer32" /f /ve
-
+echo. 
 echo Other Design Settings
+echo. 
 REG ADD HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /f /v LaunchTo /t REG_DWORD /d 1
 REG ADD HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /f /v TaskbarGlomLevel /t REG_DWORD /d 2
 REG ADD HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /f /v MMTaskbarEnabled /t REG_DWORD /d 1
 REG ADD HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /f /v MMTaskbarGlomLevel /t REG_DWORD /d 2
 REG ADD HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /f /v MMTaskbarMode /t REG_DWORD /d 2
 REG ADD HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /f /v TaskbarDa /t REG_DWORD /d 0 
-
+echo. 
 echo Disable the Search Box
 REG ADD HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Search /f /v SearchBoxTaskbarMode /t REG_DWORD /d 0 
-
+echo. 
 echo Show My Computer on Desktop
 REG ADD HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel /v "{20D04FE0-3AEA-1069-A2D8-08002B30309D}" /t REG_DWORD /d 0 /f
-
+echo. 
 echo Taskmaanger Default Register performance
 REG ADD HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\TaskManager /f /v StartUpTab /t REG_DWORD /d 1 
-
+echo. 
 echo Add END TASK to Taskbar
 reg add HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\TaskbarDeveloperSettings /f /v TaskbarEndTask /t REG_DWORD /d 1 
-
+echo. 
 Echo Disable SHARE Button on Taskbar Previews
 reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v TaskbarSn /t REG_DWORD /d 0 /f
-
+echo. 
 echo "Skipping: Install Powertoys"
 rem  winget install Microsoft.PowerToys --source winget
-
+echo. 
 echo "Skipping: Install Lenovo Commercial Vantage"
 rem winget install "Lenovo Commercial Vantage" --source=msstore --accept-package-agreements --accept-source-agreements
-
+echo. 
 echo "Debloat Windows"
-
+echo. 
 echo "winget uninstall Microsoft 365 Copilot --accept-source-agreements"
 winget uninstall "Microsoft 365 Copilot" --accept-source-agreements
 
@@ -177,16 +178,18 @@ winget uninstall "Mail and Calendar" --accept-source-agreements
 
 echo "winget uninstall windows web experience pack --accept-source-agreements"
 winget uninstall "windows web experience pack" --accept-source-agreements
-
+echo. 
+echo. 
+echo. 
 winget list
-
-
+echo. 
+echo. 
 echo run as admin press any key to continue admin tasks
-
-:: ==============================
-:: Admin Privileges Handling
-:: ==============================
-
+echo. 
+echo  ==============================
+echo Admin Privileges Handling
+echo ==============================
+echo. 
 set doAdminTask=0
 set "adminScript=%basicTempDir%\Windows-Admin-Tasks.cmd"
 
@@ -212,8 +215,10 @@ if "%doAdminTask%"=="1" (
     powercfg.exe /S SCHEME_CURRENT
 
 ) else (
-    echo "NOT ADMIN MODE - commands will be written to %adminScript%"
-
+    echo. 
+	echo "NOT ADMIN MODE - commands will be written to %adminScript%"
+	echo. 
+	echo. 	
     echo @echo off > "%adminScript%"
     echo echo Running elevated tasks... >> "%adminScript%"
 
@@ -251,7 +256,7 @@ if "%doAdminTask%"=="1" (
 
 	echo.
 	echo done. %time% %date%
-
+	echo. 
 	echo Admin script created at %adminScript%
 	echo Attempting to run it elevated after pressing any key...
 	pause
