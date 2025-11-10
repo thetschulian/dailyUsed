@@ -193,28 +193,7 @@ echo.
 set doAdminTask=0
 set "adminScript=%basicTempDir%\Windows-Admin-Tasks.cmd"
 
-if "%doAdminTask%"=="1" (
-    echo "Admin tasks will be executed directly"
 
-    :: Example admin commands run directly
-    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\54533251-82be-4824-96c1-47b60b740d00\be337238-0d82-4146-a960-4f3749d470c7" /v Attributes /t REG_DWORD /d 2 /f
-    reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Bluetooth\SwiftPair" /v QuickPair /t REG_DWORD /d 0 /f
-    schtasks /create /tn "daily_Kill_Tool" /tr "C:\Windows\System32\taskkill.exe /IM Tool.exe /F" /sc daily /st 20:00 /ru "SYSTEM"
-
-    powercfg.exe -x -monitor-timeout-ac 0
-    powercfg.exe -x -monitor-timeout-dc 0
-    powercfg.exe -x -disk-timeout-ac 0
-    powercfg.exe -x -disk-timeout-dc 0
-    powercfg.exe -x -standby-timeout-ac 0
-    powercfg.exe -x -standby-timeout-dc 0
-    powercfg.exe -x -hibernate-timeout-ac 0
-    powercfg.exe -x -hibernate-timeout-dc 0
-    powercfg.exe /hibernate off
-    powercfg.exe /setacvalueindex SCHEME_CURRENT SUB_BUTTONS LIDACTION 0
-    powercfg.exe /setdcvalueindex SCHEME_CURRENT SUB_BUTTONS LIDACTION 0
-    powercfg.exe /S SCHEME_CURRENT
-
-) else (
     echo. 
 	echo "NOT ADMIN MODE - commands will be written to %adminScript%"
 	echo. 
@@ -223,8 +202,8 @@ if "%doAdminTask%"=="1" (
     echo echo Running elevated tasks... >> "%adminScript%"
 
     echo reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\54533251-82be-4824-96c1-47b60b740d00\be337238-0d82-4146-a960-4f3749d470c7" /v Attributes /t REG_DWORD /d 2 /f >> "%adminScript%"
-    echo reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Bluetooth\SwiftPair" /v QuickPair /t REG_DWORD /d 0 /f >> "%adminScript%"
-    echo schtasks /create /tn "daily_Kill_Tool" /tr "C:\Windows\System32\taskkill.exe /IM Tool.exe /F" /sc daily /st 20:00 /ru "SYSTEM" >> "%adminScript%"
+   
+	echo schtasks /create /tn "%date%_daily_Kill_Tool" /tr "C:\Windows\System32\taskkill.exe /IM Tool.exe /F" /sc daily /st 20:00 /ru "SYSTEM" >> "%adminScript%"
 
     echo powercfg.exe -x -monitor-timeout-ac 0 >> "%adminScript%"
     echo powercfg.exe -x -monitor-timeout-dc 0 >> "%adminScript%"
@@ -261,7 +240,7 @@ if "%doAdminTask%"=="1" (
 	echo Attempting to run it elevated after pressing any key...
 	pause
 	powershell -Command "Start-Process '%adminScript%' -Verb RunAs"
-)
+
 
 
 
