@@ -1,5 +1,5 @@
 @echo off
-::::: Last Edited: 29.09.2025
+echo "Last Edited 10.11.2025"
 echo %DATE% %TIME% Script started.
 echo Run this in CMD only - powershell will cause errors
 pause
