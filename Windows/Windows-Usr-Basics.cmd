@@ -8,10 +8,12 @@ pause
 set basicTempDir=C:\temp
 echo "Creating Basic Temp Directory %basicTempDir%"
 mkdir %basicTempDir%
+
 echo "Download newest Version to %basicTempDir%"
 powershell -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/thetschulian/dailyUsed/main/Windows/Windows-Usr-Basics.cmd' -OutFile '%basicTempDir%\Windows-Usr-Basics.cmd'"
+
 echo "Download  Teamviewer Quicksupport to %basicTempDir%"
-Start-BitsTransfer -Source "https://dl.teamviewer.com/download/TeamViewerQS.exe" -Destination "%basicTempDir%\TeamviewerQS.exe"
+powershell -Command "Start-BitsTransfer -Source 'https://dl.teamviewer.com/download/TeamViewerQS.exe' -Destination '%basicTempDir%\TeamviewerQS.exe'"
 
 
 echo Win10 style rechtsklick
