@@ -183,162 +183,80 @@ winget list
 
 echo run as admin press any key to continue admin tasks
 
-pause 
+:: ==============================
+:: Admin Privileges Handling
+:: ==============================
 
-::::::START::::::::::::::::::::: CHECK FOR ADMIN PRIVILEGES
+set doAdminTask=0
+set "adminScript=%basicTempDir%\Windows-Admin-Tasks.cmd"
 
-    NET SESSION >nul 2>&1
-    IF %ERRORLEVEL% EQU 4711 (
-    
-	ECHO "Administrator PRIVILEGES Detected!"
-	echo this should be moved to a own script and run elevated. 
-	echo Launching admin tasks...
-	echo powershell -Command "Start-Process 'C:\temp\Windows-Admin-Tasks.cmd' -Verb RunAs"
+if "%doAdminTask%"=="1" (
+    echo "Admin tasks will be executed directly"
 
-		echo CPU Performance Boost (as Local ADMIN)
-			reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\54533251-82be-4824-96c1-47b60b740d00\be337238-0d82-4146-a960-4f3749d470c7" /v Attributes /t REG_DWORD /d 2 /f
-		
-		echo disable auto pair notifications of bluetooth devices
-		   reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Bluetooth\SwiftPair" /v QuickPair /t REG_DWORD /d 0 /f
-		
-		
-		 echo  Kill A Scheduled Task (as Local Admin)
-		schtasks /create /tn "daily_Kill_Tool" /tr "C:\Windows\System32\taskkill.exe /IM Tool.exe /F" /sc daily /st 20:00 /ru "SYSTEM"
-		
-		
-		echo disable monitor timeout, hibernate and standby as admin
-		
-		powercfg.exe -x -monitor-timeout-ac 0
-		powercfg.exe -x -monitor-timeout-dc 0
-		powercfg.exe -x -disk-timeout-ac 0
-		powercfg.exe -x -disk-timeout-dc 0
-		powercfg.exe -x -standby-timeout-ac 0
-		powercfg.exe -x -standby-timeout-dc 0
-		powercfg.exe -x -hibernate-timeout-ac 0
-		powercfg.exe -x -hibernate-timeout-dc 0
-		
-		REM --- Disable hibernation and Fast Startup ---
-		powercfg.exe /hibernate off
-		
-		REM --- Set lid close action to 'Do nothing' ---
-		powercfg.exe /setacvalueindex SCHEME_CURRENT SUB_BUTTONS LIDACTION 0
-		powercfg.exe /setdcvalueindex SCHEME_CURRENT SUB_BUTTONS LIDACTION 0
-		
-		REM --- Apply the changes ---
-		powercfg.exe /S SCHEME_CURRENT
+    :: Example admin commands run directly
+    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\54533251-82be-4824-96c1-47b60b740d00\be337238-0d82-4146-a960-4f3749d470c7" /v Attributes /t REG_DWORD /d 2 /f
+    reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Bluetooth\SwiftPair" /v QuickPair /t REG_DWORD /d 0 /f
+    schtasks /create /tn "daily_Kill_Tool" /tr "C:\Windows\System32\taskkill.exe /IM Tool.exe /F" /sc daily /st 20:00 /ru "SYSTEM"
 
+    powercfg.exe -x -monitor-timeout-ac 0
+    powercfg.exe -x -monitor-timeout-dc 0
+    powercfg.exe -x -disk-timeout-ac 0
+    powercfg.exe -x -disk-timeout-dc 0
+    powercfg.exe -x -standby-timeout-ac 0
+    powercfg.exe -x -standby-timeout-dc 0
+    powercfg.exe -x -hibernate-timeout-ac 0
+    powercfg.exe -x -hibernate-timeout-dc 0
+    powercfg.exe /hibernate off
+    powercfg.exe /setacvalueindex SCHEME_CURRENT SUB_BUTTONS LIDACTION 0
+    powercfg.exe /setdcvalueindex SCHEME_CURRENT SUB_BUTTONS LIDACTION 0
+    powercfg.exe /S SCHEME_CURRENT
 
-		@echo off
-		:kmsLoop
-		
-		REM ### KMS Server for Activation ###
-		set KMSServer=kms.digiboy.ir
-		
-		REM ### Generic Keys ###
-		set win10EnterpriseKey=NPPR9-FWDCX-D2C8J-H872K-2YT43
-		set win10ProKey=W269N-WFGWX-YVC9B-4J6C9-T83GX
-		set win10HomeKey=TX9XD-98N7V-6WMQ6-BX7FG-H8Q99
-		
-		echo slmgr //b /upk
-		slmgr //b /upk
-		
-		echo slmgr //b /cpky
-		slmgr //b /cpky
-		
-		echo slmgr //b /ckms
-		slmgr //b /ckms
-		
-		echo slmgr //b /ckms
-		slmgr //b /ckms
-		
-		echo slmgr //b /skms localhost
-		slmgr //b /skms localhost
-		
-		echo =========================================
-		echo.
-		echo   Verwendeter KMS Server: %KMSServer%
-		echo   [1] Win11 Enterprise
-		echo   [2] Win11 Pro
-		echo   [3] Win11 Home
-		echo.
-		
-		SET ASW=0
-		SET /P ASW=Select: 
-		
-		if %ASW%==0 goto errorHandler
-		if %ASW%==1 goto winEnterprise
-		if %ASW%==2 goto winPro
-		if %ASW%==3 goto winHome
-		goto errorHandler
-		
-		:winEnterprise
-		echo Activating Win11 Enterprise - %win10EnterpriseKey%
-		slmgr //b /ipk %win10EnterpriseKey% 
-		goto continueKMS
-		
-		:winPro
-		echo Activating Win11 Pro - %win10ProKey%
-		slmgr //b /ipk %win10ProKey%
-		goto continueKMS
-		
-		:winHome
-		echo Activating Win11 Home - %win10HomeKey%
-		slmgr //b /ipk %win10HomeKey%
-		goto continueKMS
-		
-		echo =========================================
-		
-		:continueKMS
-		ping -n 1 %KMSServer%
-		echo slmgr //b /skms %KMSServer%
-		slmgr //b /skms %KMSServer%
-		
-		echo slmgr //b /ato
-		slmgr //b /ato
-		
-		echo Ich habe fertig.
-		echo Fortfahren in 5 Sekunden
-		timeout 5
-		goto dasEnde
-		
-		:errorHandler
-		echo Falsche Nummer ausgewählt beginne von vorne...
-		pause
-		goto kmsLoop
+) else (
+    echo "NOT ADMIN MODE - commands will be written to %adminScript%"
 
-		:dasEnde
+    echo @echo off > "%adminScript%"
+    echo echo Running elevated tasks... >> "%adminScript%"
+
+    echo reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\54533251-82be-4824-96c1-47b60b740d00\be337238-0d82-4146-a960-4f3749d470c7" /v Attributes /t REG_DWORD /d 2 /f >> "%adminScript%"
+    echo reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Bluetooth\SwiftPair" /v QuickPair /t REG_DWORD /d 0 /f >> "%adminScript%"
+    echo schtasks /create /tn "daily_Kill_Tool" /tr "C:\Windows\System32\taskkill.exe /IM Tool.exe /F" /sc daily /st 20:00 /ru "SYSTEM" >> "%adminScript%"
+
+    echo powercfg.exe -x -monitor-timeout-ac 0 >> "%adminScript%"
+    echo powercfg.exe -x -monitor-timeout-dc 0 >> "%adminScript%"
+    echo powercfg.exe -x -disk-timeout-ac 0 >> "%adminScript%"
+    echo powercfg.exe -x -disk-timeout-dc 0 >> "%adminScript%"
+    echo powercfg.exe -x -standby-timeout-ac 0 >> "%adminScript%"
+    echo powercfg.exe -x -standby-timeout-dc 0 >> "%adminScript%"
+    echo powercfg.exe -x -hibernate-timeout-ac 0 >> "%adminScript%"
+    echo powercfg.exe -x -hibernate-timeout-dc 0 >> "%adminScript%"
+    echo powercfg.exe /hibernate off >> "%adminScript%"
+    echo powercfg.exe /setacvalueindex SCHEME_CURRENT SUB_BUTTONS LIDACTION 0 >> "%adminScript%"
+    echo powercfg.exe /setdcvalueindex SCHEME_CURRENT SUB_BUTTONS LIDACTION 0 >> "%adminScript%"
+    echo powercfg.exe /S SCHEME_CURRENT >> "%adminScript%"
+
+	echo "echo Starting to activate Windows" >> "%adminScript%"
+	echo "pause" >> "%adminScript%"
+	echo "set win11EnterpriseKey=NPPR9-FWDCX-D2C8J-H872K-2YT43" >> "%adminScript%"
+	echo "set win11ProKey=W269N-WFGWX-YVC9B-4J6C9-T83GX" >> "%adminScript%"
+	echo "set win11HomeKey=TX9XD-98N7V-6WMQ6-BX7FG-H8Q99" >> "%adminScript%"
+	echo "set KMSServer=kms.digiboy.ir" >> "%adminScript%"
+	echo "slmgr //b /upk" >> "%adminScript%"
+	echo "slmgr //b /cpky" >> "%adminScript%"
+	echo "slmgr //b /ckms" >> "%adminScript%"
+	echo "slmgr //b /ckms" >> "%adminScript%"
+	echo "slmgr //b /skms localhost" >> "%adminScript%"
+	echo "slmgr //b /ipk %win11EnterpriseKey%" >> "%adminScript%"
+	echo "slmgr //b /skms %KMSServer%" >> "%adminScript%"
+	echo "slmgr //b /ato" >> "%adminScript%"
 
 
-    ) ELSE (
-        ECHO "NOT AN ADMIN"
-		rem Create the admin script dynamically
-		set "adminScript=%basicTempDir%\Windows-Admin-Tasks.cmd"
-		echo "Creating Script %adminScript% now"
-		echo @echo off > "%adminScript%"
-		echo echo Running elevated tasks... >> "%adminScript%"
-		echo reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\54533251-82be-4824-96c1-47b60b740d00\be337238-0d82-4146-a960-4f3749d470c7" /v Attributes /t REG_DWORD /d 2 /f >> "%adminScript%"
-		echo reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Bluetooth\SwiftPair" /v QuickPair /t REG_DWORD /d 0 /f >> "%adminScript%"
-		echo schtasks /create /tn "daily_Kill_Tool" /tr "C:\Windows\System32\taskkill.exe /IM Tool.exe /F" /sc daily /st 20:00 /ru "SYSTEM" >> "%adminScript%"
-		echo powercfg.exe -x -monitor-timeout-ac 0 >> "%adminScript%"
-		echo powercfg.exe -x -monitor-timeout-dc 0 >> "%adminScript%"
-		echo powercfg.exe -x -disk-timeout-ac 0 >> "%adminScript%"
-		echo powercfg.exe -x -disk-timeout-dc 0 >> "%adminScript%"
-		echo powercfg.exe -x -standby-timeout-ac 0 >> "%adminScript%"
-		echo powercfg.exe -x -standby-timeout-dc 0 >> "%adminScript%"
-		echo powercfg.exe -x -hibernate-timeout-ac 0 >> "%adminScript%"
-		echo powercfg.exe -x -hibernate-timeout-dc 0 >> "%adminScript%"
-		echo powercfg.exe /hibernate off >> "%adminScript%"
-		echo powercfg.exe /setacvalueindex SCHEME_CURRENT SUB_BUTTONS LIDACTION 0 >> "%adminScript%"
-		echo powercfg.exe /setdcvalueindex SCHEME_CURRENT SUB_BUTTONS LIDACTION 0 >> "%adminScript%"
-		echo powercfg.exe /S SCHEME_CURRENT >> "%adminScript%"
-		
-		rem Launch the admin script with elevation
-		powershell -Command "Start-Process '%adminScript%' -Verb RunAs"
+    echo "Admin script created at %adminScript%"
+    echo "Run it manually as Administrator when ready."
+
+	powershell -Command "Start-Process '%adminScript%' -Verb RunAs"
+)
 
 
-
-pause
-    )
 echo.
 echo.
 ::::::END::::::::::::::::::::: CHECK FOR ADMIN PRIVILEGES
