@@ -253,13 +253,13 @@ if "%doAdminTask%"=="1" (
     echo "Admin script created at %adminScript%"
     echo "Run it manually as Administrator when ready."
 
-	powershell -Command "Start-Process '%adminScript%' -Verb RunAs"
+
 )
 
 
 echo.
-echo.
-::::::END::::::::::::::::::::: CHECK FOR ADMIN PRIVILEGES
+echo done. %time% %date%
+pause
 
 
 
