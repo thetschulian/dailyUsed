@@ -47,7 +47,7 @@ reg add HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Adv
 Echo Disable SHARE Button on Taskbar Previews
 reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v TaskbarSn /t REG_DWORD /d 0 /f
 
-rem Echo "Skipping: Install Powertoys"
+echo "Skipping: Install Powertoys"
 rem  winget install Microsoft.PowerToys --source winget
 
 echo "Skipping: Install Lenovo Commercial Vantage"
