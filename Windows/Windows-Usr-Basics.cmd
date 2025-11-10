@@ -51,128 +51,129 @@ rem  winget install Microsoft.PowerToys --source winget
 echo "Skipping: Install Lenovo Commercial Vantage"
 rem winget install "Lenovo Commercial Vantage" --source=msstore --accept-package-agreements --accept-source-agreements
 
-Echo debloat windows
-echo "winget uninstall "Microsoft 365 Copilot" --accept-source-agreements"
+echo "Debloat Windows"
+
+echo "winget uninstall Microsoft 365 Copilot --accept-source-agreements"
 winget uninstall "Microsoft 365 Copilot" --accept-source-agreements
 
-echo "winget uninstall "Copilot" --accept-source-agreements"
+echo "winget uninstall Copilot --accept-source-agreements"
 winget uninstall "Copilot" --accept-source-agreements
 
-echo "winget uninstall "Feedback Hub" --accept-source-agreements"
+echo "winget uninstall Feedback Hub --accept-source-agreements"
 winget uninstall "Feedback Hub" --accept-source-agreements
 
-echo "winget uninstall "Game Bar" --accept-source-agreements"
+echo "winget uninstall Game Bar --accept-source-agreements"
 winget uninstall "Game Bar" --accept-source-agreements
 
-echo "Skipping: winget uninstall "Paint" --accept-source-agreements"
+echo "Skipping: winget uninstall Paint --accept-source-agreements"
 ::winget uninstall "Paint" --accept-source-agreements
 
-echo "winget uninstall "Cortana" --accept-source-agreements"
+echo "winget uninstall Cortana --accept-source-agreements"
 winget uninstall "Cortana" --accept-source-agreements
 
-echo "winget uninstall "News" --accept-source-agreements"
+echo "winget uninstall News --accept-source-agreements"
 winget uninstall "News" --accept-source-agreements
 
-echo "winget uninstall "Microsoft News" --accept-source-agreements"
+echo "winget uninstall Microsoft News --accept-source-agreements"
 winget uninstall "Microsoft News" --accept-source-agreements
 
-echo "winget uninstall "Microsoft Teams" --accept-source-agreements"
+echo "winget uninstall Microsoft Teams --accept-source-agreements"
 winget uninstall "Microsoft Teams" --accept-source-agreements
 
-echo "winget uninstall "Microsoft 365 (Office)" --accept-source-agreements"
+echo "winget uninstall Microsoft 365 (Office) --accept-source-agreements"
 winget uninstall "Microsoft 365 (Office)" --accept-source-agreements
 
-echo "winget uninstall "Movies & TV " --accept-source-agreements"
+echo "winget uninstall Movies & TV --accept-source-agreements"
 winget uninstall "Movies & TV " --accept-source-agreements
 
-echo "winget uninstall "Power Automate" --accept-source-agreements"
+echo "winget uninstall Power Automate --accept-source-agreements"
 winget uninstall "Power Automate" --accept-source-agreements
 
-echo "winget uninstall "Microsoft Bing" --accept-source-agreements"
+echo "winget uninstall Microsoft Bing --accept-source-agreements"
 winget uninstall "Microsoft Bing" --accept-source-agreements
 
-echo "winget uninstall "Microsoft Tips" --accept-source-agreements"
+echo "winget uninstall Microsoft Tips --accept-source-agreements"
 winget uninstall "Microsoft Tips" --accept-source-agreements
 
-echo "winget uninstall "Microsoft People" --accept-source-agreements"
+echo "winget uninstall Microsoft People --accept-source-agreements"
 winget uninstall "Microsoft People" --accept-source-agreements
 
-echo "winget uninstall "Microsoft Photos" --accept-source-agreements"
+echo "winget uninstall Microsoft Photos --accept-source-agreements"
 winget uninstall "Microsoft Photos" --accept-source-agreements
 
-echo "winget uninstall "Microsoft Sticky Notes" --accept-source-agreements"
+echo "winget uninstall Microsoft Sticky Notes --accept-source-agreements"
 winget uninstall "Microsoft Sticky Notes" --accept-source-agreements
 
-echo "winget uninstall "Microsoft Clipchamp" --accept-source-agreements"
+echo "winget uninstall Microsoft Clipchamp --accept-source-agreements"
 winget uninstall "Microsoft Clipchamp" --accept-source-agreements
 
-echo "winget uninstall "Phone Link" --accept-source-agreements"
+echo "winget uninstall Phone Link --accept-source-agreements"
 winget uninstall "Phone Link" --accept-source-agreements
 
-echo "winget uninstall "Smartphone Link" --accept-source-agreements"
+echo "winget uninstall Smartphone Link --accept-source-agreements"
 winget uninstall "Smartphone Link" --accept-source-agreements
 
-echo "winget uninstall "Smartphone-Link" --accept-source-agreements"
+echo "winget uninstall Smartphone-Link --accept-source-agreements"
 winget uninstall "Smartphone-Link" --accept-source-agreements
 
-echo "winget uninstall "Windows Media Player" --accept-source-agreements"
+echo "winget uninstall Windows Media Player --accept-source-agreements"
 winget uninstall "Windows Media Player" --accept-source-agreements
 
-echo "winget uninstall "Outlook for Windows" --accept-source-agreements"
+echo "winget uninstall Outlook for Windows --accept-source-agreements"
 winget uninstall "Outlook for Windows" --accept-source-agreements
 
-echo "winget uninstall "Microsoft To Do" --accept-source-agreements"
+echo "winget uninstall Microsoft To Do --accept-source-agreements"
 winget uninstall "Microsoft To Do" --accept-source-agreements
 
-echo "winget uninstall "Solitaire & Casual Games" --accept-source-agreements"
+echo "winget uninstall Solitaire & Casual Games --accept-source-agreements"
 winget uninstall "Solitaire & Casual Games" --accept-source-agreements
 
-echo "winget uninstall "MSN Weather" --accept-source-agreements"
+echo "winget uninstall MSN Weather --accept-source-agreements"
 winget uninstall "MSN Weather" --accept-source-agreements
 
-echo "winget uninstall "Xbox TCUI" --accept-source-agreements"
+echo "winget uninstall Xbox TCUI --accept-source-agreements"
 winget uninstall "Xbox TCUI" --accept-source-agreements
 
-echo "winget uninstall "Xbox" --accept-source-agreements"
+echo "winget uninstall Xbox --accept-source-agreements"
 winget uninstall "Xbox" --accept-source-agreements
 
-echo "winget uninstall "Xbox Game Bar Plugin" --accept-source-agreements"
+echo "winget uninstall Xbox Game Bar Plugin --accept-source-agreements"
 winget uninstall "Xbox Game Bar Plugin" --accept-source-agreements
 
-echo "winget uninstall "Xbox Game Speech Window" --accept-source-agreements"
+echo "winget uninstall Xbox Game Speech Window --accept-source-agreements"
 winget uninstall "Xbox Game Speech Window" --accept-source-agreements
 
-echo "winget uninstall "Xbox Identity Provider" --accept-source-agreements"
+echo "winget uninstall Xbox Identity Provider --accept-source-agreements"
 winget uninstall "Xbox Identity Provider" --accept-source-agreements
 
-echo "winget uninstall "Quick Assist" --accept-source-agreements"
+echo "winget uninstall Quick Assist --accept-source-agreements"
 winget uninstall "Quick Assist" --accept-source-agreements
 
-echo "winget uninstall "Game Speech Window" --accept-source-agreements"
+echo "winget uninstall Game Speech Window --accept-source-agreements"
 winget uninstall "Game Speech Window" --accept-source-agreements
 
-echo "winget uninstall "Get Help" --accept-source-agreements"
+echo "winget uninstall Get Help --accept-source-agreements"
 winget uninstall "Get Help" --accept-source-agreements
 
-echo "winget uninstall "Microsoft Edge Game Assist" --accept-source-agreements"
+echo "winget uninstall Microsoft Edge Game Assist --accept-source-agreements"
 winget uninstall "Microsoft Edge Game Assist" --accept-source-agreements
 
-echo "winget uninstall "Windows Maps" --accept-source-agreements"
+echo "winget uninstall Windows Maps --accept-source-agreements"
 winget uninstall "Windows Maps" --accept-source-agreements
 
-echo "winget uninstall "Windows Clock" --accept-source-agreements"
+echo "winget uninstall Windows Clock --accept-source-agreements"
 winget uninstall "Windows Clock" --accept-source-agreements
 
-echo "winget uninstall "Windows Sound Recorder" --accept-source-agreements"
+echo "winget uninstall Windows Sound Recorder --accept-source-agreements"
 winget uninstall "Windows Sound Recorder" --accept-source-agreements
 
-echo "winget uninstall "Outlook for Windows" --accept-source-agreements"
+echo "winget uninstall Outlook for Windows --accept-source-agreements"
 winget uninstall "Outlook for Windows" --accept-source-agreements
 
-echo "winget uninstall "Mail and Calendar" --accept-source-agreements"
+echo "winget uninstall Mail and Calendar --accept-source-agreements"
 winget uninstall "Mail and Calendar" --accept-source-agreements
 
-echo "winget uninstall "windows web experience pack" --accept-source-agreements"
+echo "winget uninstall windows web experience pack --accept-source-agreements"
 winget uninstall "windows web experience pack" --accept-source-agreements
 
 winget list
