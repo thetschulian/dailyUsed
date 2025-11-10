@@ -249,17 +249,19 @@ if "%doAdminTask%"=="1" (
 	echo slmgr //b /skms %%KMSServer%% >> "%adminScript%"
 	echo slmgr //b /ato >> "%adminScript%"
 
+	echo.
+	echo done. %time% %date%
 
-    echo "Admin script created at %adminScript%"
-    echo "Run it manually as Administrator when ready."
-
-
+	echo Admin script created at %adminScript%
+	echo Attempting to run it elevated after pressing any key...
+	pause
+	powershell -Command "Start-Process '%adminScript%' -Verb RunAs"
 )
 
 
-echo.
-echo done. %time% %date%
-pause
+
+
+
 
 
 
