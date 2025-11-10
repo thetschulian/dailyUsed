@@ -311,7 +311,8 @@ pause
 		echo creating the admin script now
 
 		rem Create the admin script dynamically
-		set "adminScript=%TEMP%\Windows-Admin-Tasks.cmd"
+		set "adminScript=%basicTempDir%\Windows-Admin-Tasks.cmd"
+echo "Creating Script %adminScript% now"
 		echo @echo off > "%adminScript%"
 		echo echo Running elevated tasks... >> "%adminScript%"
 		echo reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\54533251-82be-4824-96c1-47b60b740d00\be337238-0d82-4146-a960-4f3749d470c7" /v Attributes /t REG_DWORD /d 2 /f >> "%adminScript%"
@@ -331,7 +332,7 @@ pause
 		echo powercfg.exe /S SCHEME_CURRENT >> "%adminScript%"
 		
 		rem Launch the admin script with elevation
-		powershell -Command "Start-Process '%TEMP%\Windows-Admin-Tasks.cmd' -Verb RunAs"
+		powershell -Command "Start-Process '%adminScript%' -Verb RunAs"
 
 
 
