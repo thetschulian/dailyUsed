@@ -10,8 +10,8 @@ echo "Creating Basic Temp Directory %basicTempDir%"
 mkdir %basicTempDir%
 echo "Download newest Version to %basicTempDir%"
 powershell -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/thetschulian/dailyUsed/main/Windows/Windows-Usr-Basics.cmd' -OutFile '%basicTempDir%\Windows-Usr-Basics.cmd'"
-echo "Skipping: Download  Teamviewer Quicksupport to %basicTempDir%"
-rem powershell -Command "Invoke-WebRequest -Uri 'https://dl.teamviewer.com/download/TeamViewerQS.exe' -OutFile '%basicTempDir%\TeamviewerQS.exe'"
+echo "Download  Teamviewer Quicksupport to %basicTempDir%"
+Start-BitsTransfer -Source "https://dl.teamviewer.com/download/TeamViewerQS.exe" -Destination "%basicTempDir%\TeamviewerQS.exe"
 
 
 echo Win10 style rechtsklick
@@ -186,7 +186,7 @@ pause
 ::::::START::::::::::::::::::::: CHECK FOR ADMIN PRIVILEGES
 
     NET SESSION >nul 2>&1
-    IF %ERRORLEVEL% EQU 0 (
+    IF %ERRORLEVEL% EQU 4711 (
     
 	ECHO "Administrator PRIVILEGES Detected!"
 	echo this should be moved to a own script and run elevated. 
@@ -309,11 +309,9 @@ pause
 
     ) ELSE (
         ECHO "NOT AN ADMIN"
-		echo creating the admin script now
-
 		rem Create the admin script dynamically
 		set "adminScript=%basicTempDir%\Windows-Admin-Tasks.cmd"
-echo "Creating Script %adminScript% now"
+		echo "Creating Script %adminScript% now"
 		echo @echo off > "%adminScript%"
 		echo echo Running elevated tasks... >> "%adminScript%"
 		echo reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\54533251-82be-4824-96c1-47b60b740d00\be337238-0d82-4146-a960-4f3749d470c7" /v Attributes /t REG_DWORD /d 2 /f >> "%adminScript%"
