@@ -8,7 +8,7 @@ pause
 set basicTempDir=C:\temp
 echo "Creating Basic Temp Directory %basicTempDir%"
 mkdir %basicTempDir%
-echo "Download newest Version to%basicTempDir%"
+echo "Download newest Version to %basicTempDir%"
 powershell -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/thetschulian/dailyUsed/main/Windows/Windows-Usr-Basics.cmd' -OutFile '%basicTempDir%\Windows-Usr-Basics.cmd'"
 echo "Skipping: Download  Teamviewer Quicksupport to %basicTempDir%"
 rem powershell -Command "Invoke-WebRequest -Uri 'https://dl.teamviewer.com/download/TeamViewerQS.exe' -OutFile '%basicTempDir%\TeamviewerQS.exe'"
