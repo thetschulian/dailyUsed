@@ -185,6 +185,10 @@ echo "Deinstall M365 Companions Files Calendar People"
 powershell -NoProfile -Command "Get-AppxPackage Microsoft.M365Companions | Remove-AppxPackage"
 rmdir /s /q "%LOCALAPPDATA%\Packages\Microsoft.M365Companions_8wekyb3d8bbwe\LocalState"
 
+echo "Deinstall Intel Bloat"
+powershell -NoProfile -Command "Get-AppxPackage *IntelGraphicsExperience* | Remove-AppxPackage"
+powershell -NoProfile -Command "Get-AppxPackage *IntelArcSoftware* | Remove-AppxPackage"
+
 
 echo. 
 echo. 
