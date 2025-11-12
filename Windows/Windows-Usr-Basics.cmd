@@ -181,11 +181,8 @@ winget uninstall "Mail and Calendar" --accept-source-agreements
 echo "winget uninstall windows web experience pack --accept-source-agreements"
 winget uninstall "windows web experience pack" --accept-source-agreements
 
-rem echo "winget uninstall xxx --accept-source-agreements"
-rem winget uninstall "xxx" --accept-source-agreements
-
-rem echo "winget uninstall xxx --accept-source-agreements"
-rem winget uninstall "xxx" --accept-source-agreements
+echo "Deinstall M365 Companions Files Calendar People"
+powershell -NoProfile -Command "Get-AppxPackage Microsoft.M365Companions | Remove-AppxPackage"
 
 echo. 
 echo. 
