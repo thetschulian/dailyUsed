@@ -183,6 +183,8 @@ winget uninstall "windows web experience pack" --accept-source-agreements
 
 echo "Deinstall M365 Companions Files Calendar People"
 powershell -NoProfile -Command "Get-AppxPackage Microsoft.M365Companions | Remove-AppxPackage"
+rmdir /s /q "%LOCALAPPDATA%\Packages\Microsoft.M365Companions_8wekyb3d8bbwe\LocalState"
+
 
 echo. 
 echo. 
