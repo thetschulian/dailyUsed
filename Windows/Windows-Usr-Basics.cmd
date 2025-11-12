@@ -23,6 +23,8 @@ echo disable win11 contect menu quasi das weitere optionen beim rechtsklicken
 reg.exe add "HKCU\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32" /f /ve
 echo disable win11 explorer command bar 
 reg.exe add "HKCU\Software\Classes\CLSID\{d93ed569-3b3e-4bff-8355-3c44f6a52bb5}\InprocServer32" /f /ve
+echo Disable Task View
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v ShowTaskViewButton /t REG_DWORD /d 0 /f
 echo. 
 echo Other Design Settings
 echo. 
@@ -178,6 +180,13 @@ winget uninstall "Mail and Calendar" --accept-source-agreements
 
 echo "winget uninstall windows web experience pack --accept-source-agreements"
 winget uninstall "windows web experience pack" --accept-source-agreements
+
+rem echo "winget uninstall xxx --accept-source-agreements"
+rem winget uninstall "xxx" --accept-source-agreements
+
+rem echo "winget uninstall xxx --accept-source-agreements"
+rem winget uninstall "xxx" --accept-source-agreements
+
 echo. 
 echo. 
 echo. 
