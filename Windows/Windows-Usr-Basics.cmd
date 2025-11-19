@@ -50,6 +50,11 @@ echo.
 Echo Disable SHARE Button on Taskbar Previews
 reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v TaskbarSn /t REG_DWORD /d 0 /f
 echo. 
+echo.
+echo.
+echo "Restarting explorer.exe now"
+taskkill /f /im explorer.exe & start explorer.exe
+timeout 5 >nul
 echo "Skipping: Install Powertoys"
 rem  winget install Microsoft.PowerToys --source winget
 echo. 
