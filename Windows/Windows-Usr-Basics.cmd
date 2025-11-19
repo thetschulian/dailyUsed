@@ -27,13 +27,20 @@ echo Disable Task View
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v ShowTaskViewButton /t REG_DWORD /d 0 /f
 echo. 
 echo Other Design Settings
-echo. 
+echo.
+echo "Disabled Set the Wallpaper"
+echo powershell -Command "(Add-Type -MemberDefinition '[DllImport(\"user32.dll\")] public static extern bool SystemParametersInfo(int uAction, int uParam, string lpvParam, int fuWinIni);' -Name NativeMethods -Namespace WinAPI -PassThru)::SystemParametersInfo(20, 0, 'C:\temp\Wallpaper_Win11_FullHD.jpg', 3)"
+echo.
 REG ADD HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /f /v LaunchTo /t REG_DWORD /d 1
 REG ADD HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /f /v TaskbarGlomLevel /t REG_DWORD /d 2
 REG ADD HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /f /v MMTaskbarEnabled /t REG_DWORD /d 1
 REG ADD HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /f /v MMTaskbarGlomLevel /t REG_DWORD /d 2
 REG ADD HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /f /v MMTaskbarMode /t REG_DWORD /d 2
 REG ADD HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /f /v TaskbarDa /t REG_DWORD /d 0 
+echo turn on dark mode
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v AppsUseLightTheme /t REG_DWORD /d 0 /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v SystemUsesLightTheme /t REG_DWORD /d 0 /f
+echo.
 echo. 
 echo Disable the Search Box
 REG ADD HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Search /f /v SearchBoxTaskbarMode /t REG_DWORD /d 0 
@@ -192,6 +199,7 @@ powershell -NoProfile -Command "Get-AppxPackage Microsoft.M365Companions | Remov
 rmdir /s /q "%LOCALAPPDATA%\Packages\Microsoft.M365Companions_8wekyb3d8bbwe\LocalState"
 
 echo "Deinstall Intel Bloat"
+winget uninstall "Intel(R) Management and Security Status" --accept-source-agreements
 powershell -NoProfile -Command "Get-AppxPackage *IntelGraphicsExperience* | Remove-AppxPackage"
 powershell -NoProfile -Command "Get-AppxPackage *IntelArcSoftware* | Remove-AppxPackage"
 
