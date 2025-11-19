@@ -60,6 +60,7 @@ echo "Debloat Windows"
 echo. 
 echo "winget uninstall Microsoft 365 Copilot --accept-source-agreements"
 winget uninstall "Microsoft 365 Copilot" --accept-source-agreements
+winget uninstall "Microsoft 365 Copilot" --accept-source-agreements
 
 echo "winget uninstall Copilot --accept-source-agreements"
 winget uninstall "Copilot" --accept-source-agreements
