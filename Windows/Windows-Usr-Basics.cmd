@@ -231,6 +231,9 @@ set "adminScript=%basicTempDir%\Windows-Admin-Tasks.cmd"
    
 	echo schtasks /create /tn "%date%_daily_Kill_Tool" /tr "C:\Windows\System32\taskkill.exe /IM Tool.exe /F" /sc daily /st 20:00 /ru "SYSTEM" >> "%adminScript%"
 
+	echo netsh advfirewall firewall add rule name="Allow RDP" dir=in action=allow protocol=TCP localport=3389 >> "%adminScript%"
+
+
     echo powercfg.exe -x -monitor-timeout-ac 0 >> "%adminScript%"
     echo powercfg.exe -x -monitor-timeout-dc 0 >> "%adminScript%"
     echo powercfg.exe -x -disk-timeout-ac 0 >> "%adminScript%"
