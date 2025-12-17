@@ -194,6 +194,21 @@ winget uninstall "Mail and Calendar" --accept-source-agreements
 echo "winget uninstall windows web experience pack --accept-source-agreements"
 winget uninstall "windows web experience pack" --accept-source-agreements
 
+echo "winget uninstall Filme & TV  --accept-source-agreements"
+winget uninstall "Filme & TV" --accept-source-agreements
+
+echo "winget uninstall Microsoft Kontakte  --accept-source-agreements"
+winget uninstall "Microsoft Kontakte" --accept-source-agreements
+
+echo "winget uninstall Mixed Reality-Portal  --accept-source-agreements"
+winget uninstall "Mixed Reality-Portal" --accept-source-agreements
+
+echo "winget uninstall Windows-Karten  --accept-source-agreements"
+winget uninstall "Windows-Karten" --accept-source-agreements
+
+echo "winget uninstall Print 3D  --accept-source-agreements"
+winget uninstall "Print 3D" --accept-source-agreements
+
 echo "Deinstall M365 Companions Files Calendar People"
 powershell -NoProfile -Command "Get-AppxPackage Microsoft.M365Companions | Remove-AppxPackage"
 rmdir /s /q "%LOCALAPPDATA%\Packages\Microsoft.M365Companions_8wekyb3d8bbwe\LocalState"
@@ -202,8 +217,6 @@ echo "Deinstall Intel Bloat"
 winget uninstall "Intel(R) Management and Security Status" --accept-source-agreements
 powershell -NoProfile -Command "Get-AppxPackage *IntelGraphicsExperience* | Remove-AppxPackage"
 powershell -NoProfile -Command "Get-AppxPackage *IntelArcSoftware* | Remove-AppxPackage"
-
-
 echo. 
 echo. 
 echo. 
