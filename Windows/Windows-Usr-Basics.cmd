@@ -228,7 +228,7 @@ set "adminScript=%basicTempDir%\Windows-Admin-Tasks.cmd"
     echo echo Running elevated tasks... >> "%adminScript%"
 
 
-	echo schtasks /create /tn "%date%_daily_Kill_Tool" /tr "C:\Windows\System32\taskkill.exe /IM Tool.exe /F" /sc daily /st 20:00 /ru "SYSTEM" >> "%adminScript%"
+	echo schtasks /create /tn "%daily_Kill_Tool" /tr "C:\Windows\System32\taskkill.exe /IM Tool.exe /F" /sc daily /st 20:00 /ru "SYSTEM" /f >> "%adminScript%"
 
 	echo netsh advfirewall firewall add rule name="Allow RDP" dir=in action=allow protocol=TCP localport=3389 >> "%adminScript%"
 	echo reg add "HKLM\SYSTEM\CurrentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 0 /f >> "%adminScript%"
