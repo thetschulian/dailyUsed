@@ -282,7 +282,7 @@ set "adminScript=%basicTempDir%\Windows-Admin-Tasks.cmd"
 	echo Attempting to run it elevated after pressing any key...
 	pause
 	powershell -Command "Start-Process '%adminScript%' -Verb RunAs"
-
+	timeout 5 >nul
 
 
 
