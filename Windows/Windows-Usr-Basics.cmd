@@ -28,7 +28,7 @@ reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v Sh
 echo. 
 echo Other Design Settings
 echo.
-echo "Disabled Set the Wallpaper"
+echo "Skipping Set the Wallpaper"
 echo powershell -Command "(Add-Type -MemberDefinition '[DllImport(\"user32.dll\")] public static extern bool SystemParametersInfo(int uAction, int uParam, string lpvParam, int fuWinIni);' -Name NativeMethods -Namespace WinAPI -PassThru)::SystemParametersInfo(20, 0, 'C:\temp\Wallpaper_Win11_FullHD.jpg', 3)"
 echo.
 REG ADD HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /f /v LaunchTo /t REG_DWORD /d 1
