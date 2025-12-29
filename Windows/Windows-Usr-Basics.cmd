@@ -2,8 +2,14 @@
 echo "Last Edited 12.11.2025"
 echo %DATE% %TIME% Script started.
 echo Run this in CMD only - powershell will cause errors
-pause
 
+echo Todos
+echo 1. Start the newly downloaded script but dont dont download again to avoid a loop. use a parameter to "call" the batch file?
+echo 2. Upload a Picture to github and add a download command to download the newly uploaded picture which is then used for the wallpaper change 
+
+echo Press any Key to start.
+
+pause
 
 set basicTempDir=C:\temp
 echo "Creating Basic Temp Directory %basicTempDir%"
