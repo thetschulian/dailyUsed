@@ -89,6 +89,12 @@ winget uninstall "Copilot" --accept-source-agreements
 echo "winget uninstall Feedback Hub --accept-source-agreements"
 winget uninstall "Feedback Hub" --accept-source-agreements
 
+echo "winget uninstall Feedback-Hub --accept-source-agreements"
+winget uninstall "Feedback-Hub" --accept-source-agreements
+
+echo "winget uninstall Schnellhilfe --accept-source-agreements"
+winget uninstall "Schnellhilfe" --accept-source-agreements
+
 echo "winget uninstall Game Bar --accept-source-agreements"
 winget uninstall "Game Bar" --accept-source-agreements
 
@@ -103,6 +109,12 @@ winget uninstall "News" --accept-source-agreements
 
 echo "winget uninstall Microsoft News --accept-source-agreements"
 winget uninstall "Microsoft News" --accept-source-agreements
+
+echo "winget uninstall Microsoft News – Nachrichten --accept-source-agreements"
+winget uninstall "Microsoft News – Nachrichten" --accept-source-agreements
+
+echo "winget uninstall Windows Medienwiedergabe --accept-source-agreements"
+winget uninstall "Windows Medienwiedergabe" --accept-source-agreements
 
 echo "winget uninstall Microsoft Teams --accept-source-agreements"
 winget uninstall "Microsoft Teams" --accept-source-agreements
