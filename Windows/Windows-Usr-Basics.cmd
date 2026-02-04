@@ -170,6 +170,9 @@ winget uninstall "Solitaire & Casual Games" --accept-source-agreements
 echo "winget uninstall MSN Weather --accept-source-agreements"
 winget uninstall "MSN Weather" --accept-source-agreements
 
+echo "winget uninstall MSN Wetter --accept-source-agreements"
+winget uninstall "MSN Wetter" --accept-source-agreements
+
 echo "winget uninstall Xbox TCUI --accept-source-agreements"
 winget uninstall "Xbox TCUI" --accept-source-agreements
 
