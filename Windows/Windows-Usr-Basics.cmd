@@ -267,7 +267,8 @@ set "adminScript=%basicTempDir%\Windows-Admin-Tasks.cmd"
 	echo Enable PING requests
 	echo netsh advfirewall firewall add rule name="Allow ICMPv4-In" protocol=icmpv4:8,any dir=in action=allow >> "%adminScript%"
 
-
+	echo sc config w32time start= auto >> "%adminScript%"
+	
 	echo schtasks /create /tn "daily_Kill_Tool" /tr "C:\Windows\System32\taskkill.exe /IM Tool.exe /F" /sc daily /st 20:00 /ru "SYSTEM" /f >> "%adminScript%"
 
 	echo netsh advfirewall firewall add rule name="Allow RDP" dir=in action=allow protocol=TCP localport=3389 >> "%adminScript%"
