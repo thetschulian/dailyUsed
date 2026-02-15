@@ -274,8 +274,8 @@ set "adminScript=%basicTempDir%\Windows-Admin-Tasks.cmd"
 
 	echo Setting Timeserver to Cloudflare and set Service to AUTO
 	echo sc config w32time start= auto >> "%adminScript%"
-	echo net stop w32time >> "%adminScript%"
 	echo w32tm /config /manualpeerlist:time.cloudflare.com /syncfromflags:manual /update >> "%adminScript%"
+	echo net stop w32time >> "%adminScript%"
 	echo net start w32time >> "%adminScript%"
 	
 	echo schtasks /create /tn "daily_Kill_Tool" /tr "C:\Windows\System32\taskkill.exe /IM Tool.exe /F" /sc daily /st 20:00 /ru "SYSTEM" /f >> "%adminScript%"
