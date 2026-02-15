@@ -271,8 +271,12 @@ set "adminScript=%basicTempDir%\Windows-Admin-Tasks.cmd"
 	echo netsh advfirewall firewall add rule name="Allow RDP for ANY" protocol=TCP dir=in localport=3389 action=allow profile=any >> "%adminScript%"
 	REM echo Enable RDP (for all specific Subnet in all Network Profiles)
 	REM echo netsh advfirewall firewall add rule name="Allow RDP-In-192.168.15.0/24 VLAN_NAME" protocol=TCP dir=in localport=3389 action=allow profile=any remoteip=192.168.15.0/24  >> "%adminScript%"
-	
+
+	echo Setting Timeserver to Cloudflare and set Service to AUTO
 	echo sc config w32time start= auto >> "%adminScript%"
+	echo net stop w32time >> "%adminScript%"
+	echo w32tm /config /manualpeerlist:time.cloudflare.com /syncfromflags:manual /update >> "%adminScript%"
+	echo net start w32time >> "%adminScript%"
 	
 	echo schtasks /create /tn "daily_Kill_Tool" /tr "C:\Windows\System32\taskkill.exe /IM Tool.exe /F" /sc daily /st 20:00 /ru "SYSTEM" /f >> "%adminScript%"
 
