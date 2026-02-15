@@ -112,7 +112,7 @@ fi
 # Install cronjob if missing
 # --------------------------------------------
 if [ ! -f "$CRONFILE" ]; then
-    echo "Installing cronjob..."
+    echo "Installing cronjob to run updates daily at 3 am ..."
     echo "0 3 * * * root bash $SCRIPT_PATH >/dev/null 2>&1" > "$CRONFILE"
     chmod 644 "$CRONFILE"
     echo "Setting Timezone to Europe/Berlin"
