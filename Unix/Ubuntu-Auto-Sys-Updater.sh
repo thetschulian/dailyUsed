@@ -4,11 +4,12 @@
 #  Universal Ubuntu Auto-Update Script
 #  - Runs system updates
 #  - Cleans old packages
-#  - Logs output
+#  - Logs output with dividers
 #  - Self-installs cronjob (runs as root)
 #  - Does NOT require executable permissions
 #  - Built-in log rotation (max 35 MB, 1 backup)
 #  - Dry-run mode (--dry-run or -n)
+#  - Visual output for manual execution
 # ============================================
 
 LOGFILE="/var/log/system-update.log"
@@ -32,37 +33,79 @@ if [ -f "$LOGFILE" ]; then
     if [ "$FILESIZE" -gt "$MAXSIZE" ]; then
         mv "$LOGFILE" "${LOGFILE}.1"
         touch "$LOGFILE"
-        echo "===== Log rotated: $(date) =====" >> "$LOGFILE"
+        echo "===== LOG ROTATED: $(date) =====" >> "$LOGFILE"
     fi
 fi
 
+# --------------------------------------------
+# Log divider for easier debugging
+# --------------------------------------------
+{
+echo ""
+echo "============================================================"
+echo "===== NEW RUN: $(date) ====="
+echo "============================================================"
+echo ""
+} >> "$LOGFILE"
+
+# --------------------------------------------
+# Visual output header
+# --------------------------------------------
 if [ "$DRYRUN" = true ]; then
-    echo "===== DRY RUN started: $(date) =====" | tee -a "$LOGFILE"
+    echo "🔧 DRY RUN MODE — no changes will be applied"
 else
-    echo "===== System Update started: $(date) =====" | tee -a "$LOGFILE"
+    echo "🔧 SYSTEM UPDATE STARTED"
 fi
+echo "Logfile: $LOGFILE"
+echo "--------------------------------------------"
 
 # --------------------------------------------
 # System updates
 # --------------------------------------------
 if [ "$DRYRUN" = true ]; then
-    echo "[DRY RUN] apt update" | tee -a "$LOGFILE"
-    echo "[DRY RUN] apt upgrade" | tee -a "$LOGFILE"
-    echo "[DRY RUN] apt full-upgrade" | tee -a "$LOGFILE"
-    echo "[DRY RUN] apt autoremove" | tee -a "$LOGFILE"
-    echo "[DRY RUN] apt autoclean" | tee -a "$LOGFILE"
+    echo "[DRY RUN] apt update"
+    echo "[DRY RUN] apt upgrade"
+    echo "[DRY RUN] apt full-upgrade"
+    echo "[DRY RUN] apt autoremove"
+    echo "[DRY RUN] apt autoclean"
+
+    echo "[DRY RUN] apt update"       >> "$LOGFILE"
+    echo "[DRY RUN] apt upgrade"      >> "$LOGFILE"
+    echo "[DRY RUN] apt full-upgrade" >> "$LOGFILE"
+    echo "[DRY RUN] apt autoremove"   >> "$LOGFILE"
+    echo "[DRY RUN] apt autoclean"    >> "$LOGFILE"
+
 else
+    echo "→ Running apt update..."
+    echo "→ Running apt update..." >> "$LOGFILE" 2>&1
     apt update -y >> "$LOGFILE" 2>&1
+
+    echo "→ Running apt upgrade..."
+    echo "→ Running apt upgrade..." >> "$LOGFILE" 2>&1
     apt upgrade -y >> "$LOGFILE" 2>&1
+
+    echo "→ Running apt full-upgrade..."
+    echo "→ Running apt full-upgrade..." >> "$LOGFILE" 2>&1
     apt full-upgrade -y >> "$LOGFILE" 2>&1
+
+    echo "→ Running apt autoremove..."
+    echo "→ Running apt autoremove..." >> "$LOGFILE" 2>&1
     apt autoremove -y >> "$LOGFILE" 2>&1
+
+    echo "→ Running apt autoclean..."
+    echo "→ Running apt autoclean..." >> "$LOGFILE" 2>&1
     apt autoclean -y >> "$LOGFILE" 2>&1
 fi
 
+# --------------------------------------------
+# Visual footer
+# --------------------------------------------
 if [ "$DRYRUN" = true ]; then
-    echo "===== DRY RUN finished: $(date) =====" | tee -a "$LOGFILE"
+    echo "--------------------------------------------"
+    echo "✔ DRY RUN FINISHED"
 else
-    echo "===== System Update finished: $(date) =====" | tee -a "$LOGFILE"
+    echo "--------------------------------------------"
+    echo "✔ SYSTEM UPDATE FINISHED"
 fi
 
 # --------------------------------------------
