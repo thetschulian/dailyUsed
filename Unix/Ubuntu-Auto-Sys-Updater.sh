@@ -3,7 +3,7 @@
 #
 #  sudo curl -o /usr/local/bin/update-system.sh https://raw.githubusercontent.com/thetschulian/dailyUsed/main/Unix/Ubuntu-Auto-Sys-Updater.sh
 #  sudo bash /usr/local/bin/update-system.sh
-#  more /var/log/system-update.log
+#  tail -f /var/log/system-update.log #to check logs
 #
 ######### Download 
 
