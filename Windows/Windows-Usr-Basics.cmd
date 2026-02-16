@@ -267,6 +267,12 @@ set "adminScript=%basicTempDir%\Windows-Admin-Tasks.cmd"
 	echo Enable PING requests
 	echo netsh advfirewall firewall add rule name="Allow ICMPv4-In" protocol=icmpv4:8,any dir=in action=allow >> "%adminScript%"
 
+	echo Disable IPv6 on existing Adapters
+	echo powershell -Command "Get-NetAdapterBinding -ComponentID ms_tcpip6 | Disable-NetAdapterBinding -ComponentID ms_tcpip6 -PassThru" >> "%adminScript%"
+	echo Disable TCP IPv6 Stack totally
+	echo reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters" /v DisabledComponents /t REG_DWORD /d 0xff /f >> "%adminScript%"
+
+
 	echo Enable RDP (for all IPs in all Network Profiles)
 	echo netsh advfirewall firewall add rule name="Allow RDP for ANY" protocol=TCP dir=in localport=3389 action=allow profile=any >> "%adminScript%"
 	REM echo Enable RDP (for all specific Subnet in all Network Profiles)
