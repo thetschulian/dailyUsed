@@ -1,11 +1,18 @@
 #!/bin/bash
+######### Download 
+#
+#  sudo curl -o /usr/local/bin/update-system.sh https://raw.githubusercontent.com/thetschulian/dailyUsed/main/Unix/Ubuntu-Auto-Sys-Updater.sh
+#  sudo bash /usr/local/bin/update-system.sh
+#  more /var/log/system-update.log
+#
+######### Download 
 
 # ============================================
 #  Universal Ubuntu Auto-Update Script
 #  - Runs system updates
 #  - Cleans old packages
 #  - Logs output with dividers
-#  - Self-installs cronjob (runs as root)
+#  - Self-installs cronjob (runs as root sundays 3am)
 #  - Does NOT require executable permissions
 #  - Built-in log rotation (max 35 MB, 1 backup)
 #  - Dry-run mode (--dry-run or -n)
