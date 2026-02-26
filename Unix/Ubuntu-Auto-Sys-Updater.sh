@@ -71,13 +71,13 @@ echo "--------------------------------------------"
 # --------------------------------------------
 if [ "$DRYRUN" = true ]; then
     echo "[DRY RUN] apt update"
-    echo "[DRY RUN] apt upgrade"
+    #echo "[DRY RUN] apt upgrade"
     echo "[DRY RUN] apt full-upgrade"
     echo "[DRY RUN] apt autoremove"
     echo "[DRY RUN] apt autoclean"
 
     echo "[DRY RUN] apt update"       >> "$LOGFILE"
-    echo "[DRY RUN] apt upgrade"      >> "$LOGFILE"
+    #echo "[DRY RUN] apt upgrade"      >> "$LOGFILE"
     echo "[DRY RUN] apt full-upgrade" >> "$LOGFILE"
     echo "[DRY RUN] apt autoremove"   >> "$LOGFILE"
     echo "[DRY RUN] apt autoclean"    >> "$LOGFILE"
@@ -87,9 +87,9 @@ else
     echo "→ Running apt update..." >> "$LOGFILE" 2>&1
     apt update -y >> "$LOGFILE" 2>&1
 
-    echo "→ Running apt upgrade..."
-    echo "→ Running apt upgrade..." >> "$LOGFILE" 2>&1
-    apt upgrade -y >> "$LOGFILE" 2>&1
+    echo "→ DISABLED Running apt upgrade..."
+    echo "→ DISABLED Running apt upgrade..." >> "$LOGFILE" 2>&1
+    #apt upgrade -y >> "$LOGFILE" 2>&1
 
     echo "→ Running apt full-upgrade..."
     echo "→ Running apt full-upgrade..." >> "$LOGFILE" 2>&1
