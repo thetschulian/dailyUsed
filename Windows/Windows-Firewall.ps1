@@ -4,7 +4,7 @@
 Set-NetFirewallProfile -Profile Domain,Private,Public -DefaultInboundAction Block
 
 # ============================
-#  ALLOW RDP ONLY FROM 10.200.16.69
+#  ALLOW RDP ONLY FROM 192.168.1.1
 # ============================
 New-NetFirewallRule -DisplayName "Allow RDP from 192.168.1.1" `
   -Direction Inbound -Protocol TCP -LocalPort 3389 `
