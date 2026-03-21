@@ -290,6 +290,13 @@ set "adminScript=%basicTempDir%\Windows-Admin-Tasks.cmd"
 	echo netsh advfirewall firewall add rule name="Allow RDP" dir=in action=allow protocol=TCP localport=3389 >> "%adminScript%"
 	echo reg add "HKLM\SYSTEM\CurrentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 0 /f >> "%adminScript%"
 
+	echo Disable WinduwsUpdate P2P delivery shit  >> "%adminScript%"
+	echo reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DeliveryOptimization" /f >> "%adminScript%"
+	echo reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DeliveryOptimization" /v DownloadMode /t REG_DWORD /d 0 /f >> "%adminScript%"
+	echo reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DeliveryOptimization" /v DODownloadMode /t REG_DWORD /d 0 /f >> "%adminScript%"
+	
+
+
 	echo echo Enable the Performance Boost Menu in PowerPlans >> "%adminScript%"
     echo reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\54533251-82be-4824-96c1-47b60b740d00\be337238-0d82-4146-a960-4f3749d470c7" /v Attributes /t REG_DWORD /d 2 /f >> "%adminScript%"
    
