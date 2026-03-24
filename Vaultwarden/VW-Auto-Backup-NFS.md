@@ -1,5 +1,5 @@
 ##  Enable Auto-Backup (Docker Images, SQL, local files)
-> To enable Auto Backup blabla
+> To enable Auto Backup enter the following command and paste the script content below
 >
 > sudo nano /usr/local/bin/backup-vaultwarden.sh
 
