@@ -1,5 +1,6 @@
 # ESXi Backup Script | Backups a specific VM to a NFS Share mounted on ESXi (no vCenter needed!!)
 
+> Create a new File on a Linux host /home/user/esxi-vmdk-backup.sh and paste the things below
 
 ```bash
 #!/bin/bash
@@ -130,5 +131,62 @@ done
 
 log "Backup completed successfully for VM: ${VM_NAME}"
 exit 0
-
 ```
+### 4. Run it manually
+```bash
+bash esxi-vmdk-backup.sh
+```
+
+
+### 5. Automate with Cron on Unix Host
+```bash
+# Open Crontable in Editmode
+crontab -e
+
+# Append the following line
+
+
+0 1 * * 0 /bin/bash /home/user/esxi-vmdk-backup.sh
+```
+
+## ⚠️ Error Handling
+The script writes logs to 
+>  ~/esxi-vmdk-backup.log
+```bash
+VMID lookup failure
+Script exits if VM name not found.
+Log: ERROR: Could not find VMID for VMNAME.
+
+Snapshot creation failure
+Script exits if snapshot fails.
+Log: ERROR: Failed to create snapshot.
+
+VMDK clone failure
+Script attempts snapshot cleanup before exiting.
+Log: ERROR: Failed to clone VMDK. Attempting to remove snapshot.
+
+Snapshot removal failure
+Script continues but warns.
+Log: WARNING: Snapshot removal failed. Please check manually.
+
+Backup transfer failure
+Script exits if scp fails.
+Log: ERROR: Failed to transfer backup to remote server.
+
+Success case
+Log: Backup completed successfully for VM: VMNAME
+```
+
+## 📌 Why a Snapshot is Taken
+> Consistency while VM is running
+>> Without a snapshot, the VM’s disk (.vmdk) is constantly being written to.
+>> If you try to copy it directly, you risk grabbing a “moving target” — the file may change mid‑copy, leading to corruption or an incomplete backup.
+
+>> Redirecting writes
+>>> When you create a snapshot, ESXi freezes the base VMDK and redirects all new writes to a separate delta file (-delta.vmdk).
+>>> The base VMDK becomes read‑only.
+>>> The delta VMDK records changes after the snapshot.
+
+>>> Safe cloning
+>>>> Because the base VMDK is now static, you can safely clone it with vmkfstools knowing it won’t change during the copy.
+>>>> This ensures the backup is consistent at the point in time the snapshot was taken.
