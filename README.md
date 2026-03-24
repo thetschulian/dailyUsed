@@ -1,7 +1,8 @@
 ## ⚠️ Disclaimer
 
 This repository contains personal, experimental, and frequently changing code.  
-Use it **at your own risk** — no guarantees, no warranties.  
+
+> Use it **at your own risk** — no guarantees, no warranties.  
 
 🎓 For **educational purposes only**  
 🛠️ Not intended for production use  
