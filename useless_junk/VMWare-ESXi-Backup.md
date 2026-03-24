@@ -1,6 +1,5 @@
 # ESXi Backup Script | Backups a specific VM to a NFS Share mounted on ESXi (no vCenter needed!!)
-> You need a Unix Host as a "jumpserver" to do this
-> 
+
 
 ```bash
 #!/bin/bash
@@ -15,9 +14,8 @@
 # - Removes the snapshot
 #
 # Requirements:
-# - NFS share mounted on ESXi as datastore (e.g. "Ubuntu-NFS")
+# - NFS share mounted on ESXi as datastore
 # - Run from a Linux VM with SSH access to ESXi host
-# - ESXi CLI tools (`vim-cmd`, `vmkfstools`) available on the host
 # - SSH key authentication set up (recommended)
 
 # === CONFIGURATION ===
