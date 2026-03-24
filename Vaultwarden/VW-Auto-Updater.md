@@ -20,7 +20,7 @@ SCRIPT_PATH="/usr/local/bin/update-vaultwarden-docker.sh"
 MAXSIZE=$((35 * 1024 * 1024))   # 35 MB
 
 # Path to your Vaultwarden docker-compose.yaml
-DOCKER_COMPOSE_FILE="/home/un26-vault/UN26-Vault/docker-compose.yaml"
+DOCKER_COMPOSE_FILE="/home/username/Vault-DIR/docker-compose.yaml"
 
 ###############################################################
 # Log rotation
