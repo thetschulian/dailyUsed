@@ -1,6 +1,8 @@
 # ESXi Backup Script | Backups a specific VM to a NFS Share mounted on ESXi (no vCenter needed!!)
 
-> Create a new File on a Linux host /home/user/esxi-vmdk-backup.sh and paste the things below
+> Create a new File on a Linux host
+>> /home/user/esxi-vmdk-backup.sh
+> and paste the things below
 
 ```bash
 #!/bin/bash
