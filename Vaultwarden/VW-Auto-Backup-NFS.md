@@ -1,4 +1,4 @@
-##  Enable Auto-Backup (Docker Images, SQL, local files)
+##  Enable Auto-Backup (Docker Images, SQL, local files) to  NFS Share
 > To enable Auto Backup enter the following command and paste the script content below
 >
 > sudo nano /usr/local/bin/backup-vaultwarden.sh
