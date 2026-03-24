@@ -2,6 +2,7 @@
 
 > Create a new File on a Linux host
 >> /home/user/esxi-vmdk-backup.sh
+>
 > and paste the things below
 
 ```bash
