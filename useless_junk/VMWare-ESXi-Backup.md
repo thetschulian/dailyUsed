@@ -1,7 +1,7 @@
 # ESXi Backup Script | Backups a specific VM to a NFS Share mounted on ESXi (no vCenter needed!!)
 
 > Create a new File on a Linux host
->> /home/user/esxi-vmdk-backup.sh
+>> nano /home/username/esxi-vmdk-backup.sh
 >
 > and paste the things below
 
@@ -137,7 +137,7 @@ exit 0
 ```
 ### 4. Run it manually
 ```bash
-bash esxi-vmdk-backup.sh
+bash /home/username/esxi-vmdk-backup.sh
 ```
 
 
@@ -149,7 +149,7 @@ crontab -e
 # Append the following line
 
 
-0 1 * * 0 /bin/bash /home/user/esxi-vmdk-backup.sh
+0 1 * * 0 /bin/bash /home/username/esxi-vmdk-backup.sh
 ```
 
 ## ⚠️ Error Handling
