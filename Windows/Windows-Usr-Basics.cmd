@@ -272,6 +272,11 @@ set "adminScript=%basicTempDir%\Windows-Admin-Tasks.cmd"
 	echo Disable TCP IPv6 Stack totally
 	echo reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters" /v DisabledComponents /t REG_DWORD /d 0xff /f >> "%adminScript%"
 
+	echo Disable Windows Media Player
+	echo dism /online /disable-feature /featurename:WindowsMediaPlayer >> "%adminScript%"
+
+	echo Enable TELNET Client 
+	echo dism /online /enable-feature /featurename:TelnetClient >> "%adminScript%"
 
 	echo Enable RDP (for all IPs in all Network Profiles)
 	echo netsh advfirewall firewall add rule name="Allow RDP for ANY" protocol=TCP dir=in localport=3389 action=allow profile=any >> "%adminScript%"
