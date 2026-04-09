@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CSR + PFX Generator</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+ <!--
+  <script src="https://cdn.jsdelivr.net/npm/jsrsasign@10.9.0/lib/jsrsasign-all-min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/node-forge@1.3.1/dist/forge.min.js"></script>
+ --> 
+
+  <script src="js/jsrsasign-all-min.js"></script>
+  <script src="js/forge.min.js"></script>
+
+
+  <style>
+    body { font-family: sans-serif; max-width: 900px; margin: 20px auto; }
+    label { display: block; margin-top: 10px; }
+    input[type="text"], input[type="password"] { width: 100%; }
+    textarea { width: 100%; font-family: monospace; }
+    #san { height: 120px; }
+    #csrOutput, #keyOutput { height: 160px; }
+    button { margin-top: 10px; padding: 8px 16px; }
+    fieldset { margin-top: 20px; padding: 15px; }
+    legend { font-weight: bold; }
+  </style>
+</head>
+<body>
+
+<h1>CSR + PFX Generator</h1>
+<p>Wichtig: Private Key bitte sicher (z.B PWDSafe) dokumentieren.</p>
+<fieldset>
+  <legend>1. Generate CSR</legend>
+
+  <form id="csrForm">
+    <h3>Subject</h3>
+
+    <label>Common Name (CN)*
+      <input type="text" id="cn" placeholder="187.domain.de" required />
+    </label>
+
+    <label>Organization (O)*
+      <input type="text" id="o" value="Your Company Here" required />
+    </label>
+
+    <label>Organizational Unit (OU)*
+      <input type="text" id="ou" placeholder="IT-Dept" required />
+    </label>
+
+    <label>Locality (L)*
+      <input type="text" id="l" value="Miami"  required/>
+    </label>
+
+    <label>State (ST)*
+      <input type="text" id="st" value="Florida"  required/>
+    </label>
+
+    <label>Country (C)*
+      <input type="text" id="c" value="US" required />
+    </label>
+
+    <h3>Subject Alternative Names (SAN)</h3>
+
+    <p><b>Example SAN entries:</b></p>
+    <pre>
+DNS: 187.domain.de
+DNS: 257.domain.de
+DNS: www.187.domain.de
+IP: 187.187.187.187
+IP: 67.67.67.67
+IP: 67.67.67.68
+    </pre>
+
+    <textarea id="san"></textarea>
+
+    <button type="submit">Generate CSR + Private Key</button>
+  </form>
+
+  <h3>CSR (PEM)</h3>
+  <textarea id="csrOutput" readonly></textarea>
+
+  <h3>Private Key (PEM)</h3>
+  <textarea id="keyOutput" readonly></textarea>
+<hr>
+  <h3>Import Private Key PEM (Optional)</h3>
+<p>Import nur erforderlich, wenn Private Key (PEM) leer ist (passiert, wenn die Seite neu geladen wird!)
+<br>Der PrivateKey wird hier nur zur Generierung der PFX Files benötigt. </p>
+  <input type="file" id="importKeyFile" accept=".pem,.key" />
+  <button type="button" id="btnImportKey">Load Private Key</button>
+</fieldset>
+
+
+
+<fieldset>
+  <legend>2. Generate PFX</legend>
+
+  <label>Issued Certificate (siehe Punkt 7.)
+    <input type="file" id="certFile" accept=".cer,.crt,.pem" />
+  </label>
+<hr>
+  <label><i>Intermediate CA Certificate (Optional)</i>
+    <input type="file" id="intermediateFile" accept=".cer,.crt,.pem" />
+  </label>
+
+  <label><i>Root CA Certificate (Optional)</i>
+    <input type="file" id="rootFile" accept=".cer,.crt,.pem" />
+  </label>
+<hr>
+  <label>PFX Password*
+    <input type="password" id="pfxPassword" required />
+  </label>
+
+  <button id="btnGenPfx" type="button">Generate PFX (Modern + Legacy)</button>
+</fieldset>
+
+<script>
+let privateKeyPem = null;
+
+// ------------------------------
+// Umlaut replacement
+// ------------------------------
+function replaceUmlauts(str) {
+  if (!str) return "";
+  return str
+    .replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue")
+    .replace(/Ä/g, "Ae").replace(/Ö/g, "Oe").replace(/Ü/g, "Ue")
+    .replace(/ß/g, "ss");
+}
+
+// ------------------------------
+// Normalize certificate
+// ------------------------------
+function normalizeToPem(text) {
+  const t = text.toString().trim();
+  if (t.includes("BEGIN CERTIFICATE")) return t;
+  const b64 = forge.util.encode64(t);
+  return "-----BEGIN CERTIFICATE-----\n" + b64 + "\n-----END CERTIFICATE-----\n";
+}
+
+// ------------------------------
+// Download helper
+// ------------------------------
+function downloadBinary(binaryStr, filename) {
+  const bytes = new Uint8Array(binaryStr.length);
+  for (let i = 0; i < binaryStr.length; i++) bytes[i] = binaryStr.charCodeAt(i);
+  const blob = new Blob([bytes], { type: "application/x-pkcs12" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ------------------------------
+// CSR GENERATION
+// ------------------------------
+document.getElementById("csrForm").addEventListener("submit", function (e) {
+  e.preventDefault();
+
+  console.log("=== CSR GENERATION START ===");
+
+  // Read + convert umlauts
+  const cn = replaceUmlauts(document.getElementById("cn").value.trim());
+  const o  = replaceUmlauts(document.getElementById("o").value.trim());
+  const ou = replaceUmlauts(document.getElementById("ou").value.trim());
+  const l  = replaceUmlauts(document.getElementById("l").value.trim());
+  const st = replaceUmlauts(document.getElementById("st").value.trim());
+  const c  = replaceUmlauts(document.getElementById("c").value.trim());
+
+  console.log("Subject input:", { cn, o, ou, l, st, c });
+
+  // Generate keypair
+  const kp = KEYUTIL.generateKeypair("RSA", 2048);
+  const prvKeyObj = kp.prvKeyObj;
+  const pubKeyObj = kp.pubKeyObj;
+
+  console.log("Keypair generated");
+
+  // ------------------------------
+  // SUBJECT STRING BUILDER
+  // ------------------------------
+  let subjectParts = [];
+
+  function addIfFilled(type, value) {
+    if (value && value.trim() !== "") {
+      subjectParts.push(type + "=" + value.trim());
+    }
+  }
+
+  addIfFilled("C",  c);
+  addIfFilled("ST", st);
+  addIfFilled("L",  l);
+  addIfFilled("O",  o);
+  addIfFilled("OU", ou);
+  addIfFilled("CN", cn);
+
+  const subjectStr = "/" + subjectParts.join("/");
+
+  console.log("Subject string:", subjectStr);
+
+  // ------------------------------
+  // SAN parsing
+  // ------------------------------
+  let sanLines = document.getElementById("san").value
+    .split("\n")
+    .map(l => replaceUmlauts(l.trim()))
+    .filter(l => l.length > 0);
+
+  console.log("SAN lines before CN injection:", sanLines);
+
+  // ------------------------------
+  // AUTO‑ADD CN AS FIRST SAN ENTRY
+  // ------------------------------
+  const cnSan = "DNS:" + cn;
+
+  // Remove duplicates
+  sanLines = sanLines.filter(l => l.toLowerCase() !== cnSan.toLowerCase());
+
+  // Insert CN at top
+  sanLines.unshift(cnSan);
+
+  console.log("SAN lines after CN injection:", sanLines);
+
+  // Convert to jsrsasign SAN array
+  const sanArray = sanLines.map(line => {
+    const lower = line.toLowerCase();
+    if (lower.startsWith("dns:")) return { dns: line.substring(4).trim() };
+    if (lower.startsWith("ip:"))  return { ip:  line.substring(3).trim() };
+  });
+
+  console.log("Final SAN array:", sanArray);
+
+  // ------------------------------
+  // Build CSR
+  // ------------------------------
+  const csrParams = {
+    subject: { str: subjectStr },
+    sbjpubkey: pubKeyObj,
+    sigalg: "SHA256withRSA",
+    sbjprvkey: prvKeyObj,
+    extreq: [
+      { extname: "subjectAltName", array: sanArray }
+    ]
+  };
+
+  console.log("CSR params:", csrParams);
+
+  const csr = new KJUR.asn1.csr.CertificationRequest(csrParams);
+  const csrPem = csr.getPEM();
+  const prvPem = KEYUTIL.getPEM(prvKeyObj, "PKCS1PRV");
+
+  privateKeyPem = prvPem;
+
+  document.getElementById("csrOutput").value = csrPem;
+  document.getElementById("keyOutput").value = prvPem;
+
+  console.log("CSR generated successfully");
+  console.log("=== CSR GENERATION END ===");
+
+  alert("CSR and private key generated.");
+});
+
+// ------------------------------
+// Import private key
+// ------------------------------
+document.getElementById("btnImportKey").addEventListener("click", function () {
+  const fileInput = document.getElementById("importKeyFile");
+  if (!fileInput.files.length) {
+    alert("Select a private key file first.");
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    privateKeyPem = e.target.result.trim();
+    document.getElementById("keyOutput").value = privateKeyPem;
+    console.log("Private key imported");
+  };
+  reader.readAsText(fileInput.files[0]);
+});
+
+// ------------------------------
+// PFX GENERATION
+// ------------------------------
+document.getElementById("btnGenPfx").addEventListener("click", function () {
+  if (!privateKeyPem) {
+    alert("No private key available.");
+    return;
+  }
+
+  const certFile = document.getElementById("certFile").files[0];
+  if (!certFile) {
+    alert("Upload the issued certificate.");
+    return;
+  }
+
+  const password = document.getElementById("pfxPassword").value;
+  if (!password) {
+    alert("Enter a PFX password.");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = async function (e) {
+    const certPem = normalizeToPem(e.target.result);
+
+    let intermediatePem = null;
+    let rootPem = null;
+
+    const intFile = document.getElementById("intermediateFile").files[0];
+    if (intFile) {
+      const r2 = new FileReader();
+      await new Promise(resolve => {
+        r2.onload = x => {
+          intermediatePem = normalizeToPem(x.target.result);
+          resolve();
+        };
+        r2.readAsText(intFile);
+      });
+    }
+
+    const rootFile = document.getElementById("rootFile").files[0];
+    if (rootFile) {
+      const r3 = new FileReader();
+      await new Promise(resolve => {
+        r3.onload = x => {
+          rootPem = normalizeToPem(x.target.result);
+          resolve();
+        };
+        r3.readAsText(rootFile);
+      });
+    }
+
+    createPfxFiles(privateKeyPem, certPem, intermediatePem, rootPem, password);
+  };
+
+  reader.readAsText(certFile);
+});
+
+function createPfxFiles(privateKeyPem, certPem, intermediatePem, rootPem, password) {
+  console.log("=== PFX GENERATION START ===");
+
+  const forgePrivateKey = forge.pki.privateKeyFromPem(privateKeyPem);
+  const forgeCert = forge.pki.certificateFromPem(certPem);
+
+  const chain = [forgeCert];
+  if (intermediatePem) chain.push(forge.pki.certificateFromPem(intermediatePem));
+  if (rootPem) chain.push(forge.pki.certificateFromPem(rootPem));
+
+  console.log("Certificate chain:", chain);
+
+  const pfxModernAsn1 = forge.pkcs12.toPkcs12Asn1(
+    forgePrivateKey,
+    chain,
+    password,
+    { algorithm: "aes256", generateLocalKeyId: true }
+  );
+  const pfxModernDer = forge.asn1.toDer(pfxModernAsn1).getBytes();
+  downloadBinary(pfxModernDer, "certificate-modern.pfx");
+
+  const pfxLegacyAsn1 = forge.pkcs12.toPkcs12Asn1(
+    forgePrivateKey,
+    chain,
+    password,
+    { algorithm: "3des", generateLocalKeyId: true }
+  );
+  const pfxLegacyDer = forge.asn1.toDer(pfxLegacyAsn1).getBytes();
+  downloadBinary(pfxLegacyDer, "certificate-legacy.pfx");
+
+  console.log("=== PFX GENERATION END ===");
+
+  alert("PFX files generated (modern + legacy).");
+}
+</script>
+
+</body>
+</html>
