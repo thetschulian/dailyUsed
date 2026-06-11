@@ -79,6 +79,10 @@ rem winget install "Lenovo Commercial Vantage" --source=msstore --accept-package
 echo. 
 echo "Debloat Windows"
 echo. 
+
+echo "winget uninstall WhatsApp --accept-source-agreements"
+winget uninstall "WhatsApp" --accept-source-agreements
+
 echo "winget uninstall Microsoft 365 Copilot --accept-source-agreements"
 winget uninstall "Microsoft 365 Copilot" --accept-source-agreements
 winget uninstall "Microsoft 365 Copilot" --accept-source-agreements
@@ -300,7 +304,9 @@ set "adminScript=%basicTempDir%\Windows-Admin-Tasks.cmd"
 	echo reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DeliveryOptimization" /v DownloadMode /t REG_DWORD /d 0 /f >> "%adminScript%"
 	echo reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DeliveryOptimization" /v DODownloadMode /t REG_DWORD /d 0 /f >> "%adminScript%"
 	
-
+	echo Enable Hello for Windows >>  "%adminScript%"
+	echo reg add "HKLM\SOFTWARE\Policies\Microsoft\PassportForWork" /v Enabled /t REG_DWORD /d 1 /f >>  "%adminScript%"
+	echo reg add "HKLM\SOFTWARE\Policies\Microsoft\PassportForWork" /v DisablePostLogonProvisioning /t REG_DWORD /d 0 /f >>  "%adminScript%"
 
 	echo echo Enable the Performance Boost Menu in PowerPlans >> "%adminScript%"
     echo reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\54533251-82be-4824-96c1-47b60b740d00\be337238-0d82-4146-a960-4f3749d470c7" /v Attributes /t REG_DWORD /d 2 /f >> "%adminScript%"
