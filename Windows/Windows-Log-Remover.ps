@@ -1,0 +1,418 @@
+# ============================================================================
+# BULLETPROOF LogRemover Bootstrap Script
+# Copy & Paste this entire script into PowerShell (run as Administrator)
+# It will create and install LogRemover automatically
+# ============================================================================
+
+# Check if running as Administrator
+$IsAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+if (-not $IsAdmin) {
+    Write-Output ""
+    Write-Output "❌ ERROR: Administrator privileges required!"
+    Write-Output ""
+    Write-Output "Please close this window and:"
+    Write-Output "  1. Right-click PowerShell or ISE"
+    Write-Output "  2. Select 'Run as administrator'"
+    Write-Output "  3. Copy & paste this entire script again"
+    Write-Output ""
+    Read-Host "Press Enter to exit"
+    exit 1
+}
+
+# ============================================================================
+# CONFIGURATION VARIABLES - Edit these, then re-run to apply changes
+# ============================================================================
+$TargetDir     = "C:\Program Files (x86)\LogRemover"   
+$ScriptFile    = Join-Path $TargetDir "LogRemover.ps1"
+$LogDir        = Join-Path $TargetDir "Logs"
+$LogFile       = Join-Path $LogDir "LogRemover.log"
+$MaxLogSize    = 50MB
+$MaxLogFiles   = 3
+$RegistryPath  = "HKCU:\Software\LogRemover"
+$RegistryKey   = "Installed"
+#### THIS DIRECTORY WILL BE CLEANED ############
+#### THIS DIRECTORY WILL BE CLEANED ############
+$LogDirectory  = "C:\inetpub\wwwroot\Citrix\StorageCenter\SC\logs"    #### THIS DIRECTORY WILL BE CLEANED ############
+#### THIS DIRECTORY WILL BE CLEANED ############
+#### THIS DIRECTORY WILL BE CLEANED ############
+$DaysOld       = 5
+$TaskName      = "LogRemover-CleanOldFiles"
+$ScheduleTime  = "02:00"
+$DryRun        = $false   # <-- Set to $true to LOG what WOULD be deleted, without deleting anything
+$SafetyMarkerFile = Join-Path $LogDirectory ".logremover_safety_marker"
+
+Write-Output ""
+Write-Output "=========================================="
+Write-Output "  LogRemover - Bulletproof Bootstrap"
+Write-Output "=========================================="
+Write-Output ""
+
+# Verify target directory exists
+if (-not (Test-Path -Path $LogDirectory)) {
+    Write-Output "ERROR: Target directory does not exist: $LogDirectory"
+    Write-Output "Cannot proceed - target directory must exist first"
+    Read-Host "Press Enter to exit"
+    exit 1
+}
+
+Write-Output "✓ Target directory verified: $LogDirectory"
+
+# Create log directory if it doesn't exist
+if (-not (Test-Path -Path $LogDir)) {
+    New-Item -ItemType Directory -Path $LogDir -Force | Out-Null
+}
+
+# Logging function with rotation
+function Write-LogEntry {
+    param(
+        [string]$Message,
+        [string]$Level = "INFO"
+    )
+    
+    $Timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    $LogMessage = "[$Timestamp] [$Level] $Message"
+    
+    # Write to console
+    Write-Output $LogMessage
+    
+    # Check if log file needs rotation
+    if ((Test-Path -Path $LogFile) -and (Get-Item $LogFile).Length -gt $MaxLogSize) {
+        Rotate-LogFile
+    }
+    
+    # Write to log file
+    Add-Content -Path $LogFile -Value $LogMessage -ErrorAction SilentlyContinue
+}
+
+# Log rotation function
+function Rotate-LogFile {
+    $LogBaseName = [System.IO.Path]::GetFileNameWithoutExtension($LogFile)
+    $LogExtension = [System.IO.Path]::GetExtension($LogFile)
+    
+    try {
+        # Rename existing logs
+        for ($i = $MaxLogFiles - 1; $i -gt 0; $i--) {
+            $OldLog = Join-Path $LogDir "$($LogBaseName).$i$LogExtension"
+            $NewLog = Join-Path $LogDir "$($LogBaseName).$($i + 1)$LogExtension"
+            
+            if (Test-Path -Path $OldLog) {
+                if ($i + 1 -gt $MaxLogFiles) {
+                    Remove-Item -Path $OldLog -Force -ErrorAction SilentlyContinue
+                } else {
+                    Rename-Item -Path $OldLog -NewName (Split-Path $NewLog -Leaf) -Force -ErrorAction SilentlyContinue
+                }
+            }
+        }
+        
+        # Rename current log to .1
+        if (Test-Path -Path $LogFile) {
+            $NewLogName = "$($LogBaseName).1$LogExtension"
+            Rename-Item -Path $LogFile -NewName $NewLogName -Force -ErrorAction SilentlyContinue
+        }
+        
+        # Clean up logs older than max
+        Get-ChildItem -Path $LogDir -Filter "$($LogBaseName).*$LogExtension" -ErrorAction SilentlyContinue | 
+            Where-Object { [int]($_.BaseName -replace "$LogBaseName.", "") -gt $MaxLogFiles } |
+            Remove-Item -Force -ErrorAction SilentlyContinue
+    }
+    catch {
+        Write-Output "Warning: Could not rotate log file: $_"
+    }
+}
+
+Write-LogEntry "=========================================="
+Write-LogEntry "  LogRemover - Bulletproof Bootstrap"
+Write-LogEntry "=========================================="
+Write-LogEntry ""
+
+# Create target directory
+if (-not (Test-Path -Path $TargetDir)) {
+    New-Item -ItemType Directory -Path $TargetDir -Force | Out-Null
+    Write-LogEntry "✓ Created directory: $TargetDir"
+}
+
+# Create safety marker in TARGET DELETION directory to verify it's accessible
+try {
+    Set-Content -Path $SafetyMarkerFile -Value "LogRemover Safety Marker - Target Directory Verified" -Force
+    Write-LogEntry "✓ Created safety marker in target directory"
+} catch {
+    Write-LogEntry "WARNING: Could not create marker in target directory - check write permissions" "WARNING"
+}
+
+# Define the BULLETPROOF LogRemover script
+$LogRemoverScript = @'
+# ============================================================================
+# BULLETPROOF LogRemover Script
+# CRITICAL: This script has multiple safety checks to prevent deletion of wrong files
+# ============================================================================
+
+# ABSOLUTE PATHS ONLY - Injected by bootstrap at install time
+$TargetLogDir = "__TARGET_LOG_DIR__"
+$LogDir = "__LOG_DIR__"
+$LogFile = "$LogDir\LogRemover.log"
+$SafetyMarkerFile = "__SAFETY_MARKER__"
+$DaysOld = __DAYS_OLD__
+$MaxLogSize = __MAX_LOG_SIZE__
+$MaxLogFiles = __MAX_LOG_FILES__
+$DryRun = __DRY_RUN__
+
+# VERIFY ADMIN RIGHTS
+$IsAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+if (-not $IsAdmin) {
+    Write-Output "ERROR: Not running as Administrator - Aborting"
+    exit 1
+}
+
+# Create log directory
+if (-not (Test-Path -Path $LogDir)) {
+    New-Item -ItemType Directory -Path $LogDir -Force -ErrorAction SilentlyContinue | Out-Null
+}
+
+# Logging function with rotation
+function Write-LogEntry {
+    param([string]$Message, [string]$Level = "INFO")
+    $Timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    $LogMessage = "[$Timestamp] [$Level] $Message"
+    Write-Output $LogMessage
+    
+    if ((Test-Path -Path $LogFile) -and (Get-Item $LogFile).Length -gt $MaxLogSize) {
+        Rotate-LogFile
+    }
+    
+    Add-Content -Path $LogFile -Value $LogMessage -ErrorAction SilentlyContinue
+}
+
+function Rotate-LogFile {
+    $LogBaseName = [System.IO.Path]::GetFileNameWithoutExtension($LogFile)
+    $LogExtension = [System.IO.Path]::GetExtension($LogFile)
+    
+    try {
+        for ($i = $MaxLogFiles - 1; $i -gt 0; $i--) {
+            $OldLog = "$LogDir\$($LogBaseName).$i$LogExtension"
+            $NewLog = "$LogDir\$($LogBaseName).$($i + 1)$LogExtension"
+            
+            if (Test-Path -Path $OldLog) {
+                if ($i + 1 -gt $MaxLogFiles) {
+                    Remove-Item -Path $OldLog -Force -ErrorAction SilentlyContinue
+                } else {
+                    Rename-Item -Path $OldLog -NewName (Split-Path $NewLog -Leaf) -Force -ErrorAction SilentlyContinue
+                }
+            }
+        }
+        
+        if (Test-Path -Path $LogFile) {
+            $NewLogName = "$($LogBaseName).1$LogExtension"
+            Rename-Item -Path $LogFile -NewName $NewLogName -Force -ErrorAction SilentlyContinue
+        }
+        
+        Get-ChildItem -Path $LogDir -Filter "$($LogBaseName).*$LogExtension" -ErrorAction SilentlyContinue | 
+            Where-Object { [int]($_.BaseName -replace "$LogBaseName.", "") -gt $MaxLogFiles } |
+            Remove-Item -Force -ErrorAction SilentlyContinue
+    }
+    catch {
+        Write-Output "Warning: Could not rotate log file: $_"
+    }
+}
+
+# ============================================================================
+# SAFETY CHECK 1: Verify safety marker file exists in the target directory
+# (Confirms the target dir exists AND is the same one the installer set up)
+# ============================================================================
+if (-not (Test-Path -Path $SafetyMarkerFile)) {
+    Write-LogEntry "CRITICAL ERROR: Safety marker not found at: $SafetyMarkerFile" "CRITICAL"
+    Write-LogEntry "Target directory is missing or was not set up by the installer. Aborting." "CRITICAL"
+    exit 1
+}
+Write-LogEntry "✓ Safety marker verified in target directory"
+
+# ============================================================================
+# SAFETY CHECK 2: Verify target directory is the correct one
+# ============================================================================
+if (-not (Test-Path -Path $TargetLogDir)) {
+    Write-LogEntry "ERROR: Target directory does not exist: $TargetLogDir" "ERROR"
+    exit 1
+}
+
+if ($TargetLogDir -notlike "*StorageCenter*" -or $TargetLogDir -notlike "*SC*logs*") {
+    Write-LogEntry "CRITICAL ERROR: Invalid target directory path: $TargetLogDir" "CRITICAL"
+    Write-LogEntry "Path must contain 'StorageCenter' and 'SC\logs'. Aborting." "CRITICAL"
+    exit 1
+}
+
+Write-LogEntry "✓ Target directory verified: $TargetLogDir"
+
+# ============================================================================
+# SAFETY CHECK 3: Dry run first - count files only
+# ============================================================================
+Write-LogEntry "Starting cleanup for files older than $DaysOld days"
+Write-LogEntry "Target: $TargetLogDir"
+
+$CutoffDate = (Get-Date).AddDays(-$DaysOld)
+$FilesFound = 0
+$FilesRemoved = 0
+$FilesNotRemoved = 0
+
+try {
+    # Build list of files to delete (excluding the safety marker itself)
+    $FilesToDelete = @()
+    
+    Get-ChildItem -Path $TargetLogDir -File -ErrorAction Stop | Where-Object { 
+        $_.LastWriteTime -lt $CutoffDate -and $_.FullName -ne $SafetyMarkerFile 
+    } | ForEach-Object {
+        $FilesToDelete += $_
+        $FilesFound++
+    }
+    
+    if ($DryRun) {
+        Write-LogEntry "*** DRY RUN MODE - No files will be deleted ***" "DRYRUN"
+    }
+    Write-LogEntry "Found $FilesFound files older than $DaysOld days"
+    
+    # SAFETY CHECK 4: Verify all files are in the correct directory
+    foreach ($File in $FilesToDelete) {
+        $FileDir = Split-Path -Path $File.FullName -Parent
+        if ($FileDir -ne $TargetLogDir) {
+            Write-LogEntry "CRITICAL ERROR: File is not in target directory: $($File.FullName)" "CRITICAL"
+            Write-LogEntry "Expected directory: $TargetLogDir" "CRITICAL"
+            Write-LogEntry "Aborting to prevent data loss" "CRITICAL"
+            exit 1
+        }
+    }
+    
+    Write-LogEntry "✓ All files verified to be in correct directory"
+    
+    # ============================================================================
+    # ACTUAL DELETION - Only proceed after all checks pass
+    # ============================================================================
+    
+    if ($FilesToDelete.Count -eq 0) {
+        Write-LogEntry "No files older than $DaysOld days found"
+    }
+    elseif ($DryRun) {
+        Write-LogEntry "DRY RUN: The following $($FilesToDelete.Count) files WOULD be deleted:" "DRYRUN"
+        foreach ($File in $FilesToDelete) {
+            Write-LogEntry "  [WOULD DELETE] $($File.FullName) (Modified: $($File.LastWriteTime))" "DRYRUN"
+        }
+        Write-LogEntry "DRY RUN complete - nothing was deleted" "DRYRUN"
+    }
+    else {
+        Write-LogEntry "Proceeding with deletion of $($FilesToDelete.Count) files"
+        
+        foreach ($File in $FilesToDelete) {
+            try {
+                # FINAL CHECK: Verify file is still in correct directory before deletion
+                $ParentDir = Split-Path -Path $File.FullName -Parent
+                if ($ParentDir -eq $TargetLogDir) {
+                    Remove-Item -Path $File.FullName -Force
+                    Write-LogEntry "Removed: $($File.FullName) (Modified: $($File.LastWriteTime))"
+                    $FilesRemoved++
+                } else {
+                    Write-LogEntry "SKIPPED: File not in target directory: $($File.FullName)" "WARNING"
+                    $FilesNotRemoved++
+                }
+            }
+            catch {
+                Write-LogEntry "Failed to remove: $($File.FullName) - Error: $_" "WARNING"
+                $FilesNotRemoved++
+            }
+        }
+    }
+    
+    Write-LogEntry ""
+    Write-LogEntry "=========================================="
+    if ($DryRun) {
+        Write-LogEntry "DRY RUN Summary: $FilesFound files would be deleted."
+    } else {
+        Write-LogEntry "Summary: Removed $FilesRemoved files. Failed to remove $FilesNotRemoved files."
+    }
+    Write-LogEntry "=========================================="
+}
+catch {
+    Write-LogEntry "CRITICAL ERROR during cleanup: $_" "ERROR"
+    Write-LogEntry "No files were deleted" "ERROR"
+    exit 1
+}
+'@
+
+# Inject configuration values into the script (replaces placeholder tokens)
+$LogRemoverScript = $LogRemoverScript.Replace('__TARGET_LOG_DIR__', $LogDirectory)
+$LogRemoverScript = $LogRemoverScript.Replace('__LOG_DIR__', $LogDir)
+$LogRemoverScript = $LogRemoverScript.Replace('__SAFETY_MARKER__', $SafetyMarkerFile)
+$LogRemoverScript = $LogRemoverScript.Replace('__DAYS_OLD__', $DaysOld)
+$LogRemoverScript = $LogRemoverScript.Replace('__MAX_LOG_SIZE__', '50MB')
+$LogRemoverScript = $LogRemoverScript.Replace('__MAX_LOG_FILES__', $MaxLogFiles)
+$LogRemoverScript = $LogRemoverScript.Replace('__DRY_RUN__', "`$$DryRun")
+
+# Write the script to file
+try {
+    Set-Content -Path $ScriptFile -Value $LogRemoverScript -Force
+    Write-LogEntry "✓ Script created/updated: $ScriptFile"
+    Write-LogEntry "  Config applied - DaysOld: $DaysOld, DryRun: $DryRun"
+}
+catch {
+    Write-LogEntry "Failed to create script file: $_" "ERROR"
+    Read-Host "Press Enter to exit"
+    exit 1
+}
+
+# Create scheduled task
+Write-LogEntry ""
+Write-LogEntry "Creating scheduled task..."
+Write-LogEntry ""
+
+try {
+    $Action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoProfile -ExecutionPolicy Bypass -File `"$ScriptFile`""
+    $Trigger = New-ScheduledTaskTrigger -Daily -At $ScheduleTime
+    $Settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -RunOnlyIfNetworkAvailable
+    
+    Register-ScheduledTask -TaskName $TaskName `
+                          -Action $Action `
+                          -Trigger $Trigger `
+                          -Settings $Settings `
+                          -Description "Safely removes log files older than $DaysOld days from StorageCenter" `
+                          -RunLevel Highest `
+                          -Force | Out-Null
+    
+    Write-LogEntry "✓ Scheduled task created!"
+    Write-LogEntry "  Task: $TaskName"
+    Write-LogEntry "  Schedule: Daily at $ScheduleTime"
+}
+catch {
+    Write-LogEntry "Failed to create scheduled task: $_" "ERROR"
+    Read-Host "Press Enter to exit"
+    exit 1
+}
+
+# Mark as installed in registry
+try {
+    if (-not (Test-Path -Path $RegistryPath)) {
+        New-Item -Path $RegistryPath -Force | Out-Null
+    }
+    New-ItemProperty -Path $RegistryPath -Name $RegistryKey -Value "1" -PropertyType DWORD -Force | Out-Null
+    Write-LogEntry "✓ Registry entry created: $RegistryPath\$RegistryKey"
+}
+catch {
+    Write-LogEntry "Could not create registry entry: $_" "WARNING"
+}
+
+Write-LogEntry ""
+Write-LogEntry "=========================================="
+Write-LogEntry "  ✓ Installation Complete!"
+Write-LogEntry "=========================================="
+Write-LogEntry ""
+Write-LogEntry "LogRemover is now installed and configured:"
+Write-LogEntry "  • Script location: $ScriptFile"
+Write-LogEntry "  • Scheduled task: $TaskName"
+Write-LogEntry "  • Daily execution: $ScheduleTime"
+Write-LogEntry "  • Target directory: $LogDirectory"
+Write-LogEntry "  • Removes files older than: $DaysOld days"
+Write-LogEntry "  • Log location: $LogFile"
+Write-LogEntry ""
+Write-LogEntry "Safety features:"
+Write-LogEntry "  ✓ Multiple path validations"
+Write-LogEntry "  ✓ Dry-run before deletion"
+Write-LogEntry "  ✓ Per-file directory verification"
+Write-LogEntry "  ✓ Admin rights check"
+Write-LogEntry "  ✓ Safety marker verification"
+Write-LogEntry ""
+Write-LogEntry "You can close this window."
