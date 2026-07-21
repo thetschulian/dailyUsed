@@ -22,22 +22,21 @@ if (-not $IsAdmin) {
 # ============================================================================
 # CONFIGURATION VARIABLES - Edit these, then re-run to apply changes
 # ============================================================================
-$TargetDir     = "C:\Program Files (x86)\LogRemover"   
+$TargetDir     = "C:\Program Files (x86)\LogRemover"
 $ScriptFile    = Join-Path $TargetDir "LogRemover.ps1"
 $LogDir        = Join-Path $TargetDir "Logs"
 $LogFile       = Join-Path $LogDir "LogRemover.log"
 $MaxLogSize    = 50MB
 $MaxLogFiles   = 3
-#### THIS DIRECTORY WILL BE CLEANED ############
-#### THIS DIRECTORY WILL BE CLEANED ############
-$LogDirectory  = "C:\inetpub\wwwroot\Citrix\StorageCenter\SC\logs"    #### THIS DIRECTORY WILL BE CLEANED ############
-$DryRun        = $false     # if true, only show whats beeing deleted
-#### THIS DIRECTORY WILL BE CLEANED ############
-#### THIS DIRECTORY WILL BE CLEANED ############
+$LogDirectories = @(
+    "C:\inetpub\logs\LogFiles\W3SVC1"
+    "C:\inetpub\wwwroot\Citrix\StorageCenter\SC\logs"
+    "C:\temp"
+)
 $DaysOld       = 5
 $TaskName      = "LogRemover-CleanOldFiles"
 $ScheduleTime  = "02:00"
-$SafetyMarkerFile = Join-Path $LogDirectory ".logremover_safety_marker"
+$DryRun        = $false   # <-- Set to $true to LOG what WOULD be deleted, without deleting anything
 
 Write-Output ""
 Write-Output "=========================================="
@@ -45,15 +44,20 @@ Write-Output "  LogRemover - Bulletproof Bootstrap"
 Write-Output "=========================================="
 Write-Output ""
 
-# Verify target directory exists
-if (-not (Test-Path -Path $LogDirectory)) {
-    Write-Output "ERROR: Target directory does not exist: $LogDirectory"
-    Write-Output "Cannot proceed - target directory must exist first"
+# Verify at least one target directory exists
+$ValidDirs = @($LogDirectories | Where-Object { Test-Path -Path $_ })
+if ($ValidDirs.Count -eq 0) {
+    Write-Output "ERROR: None of the target directories exist:"
+    $LogDirectories | ForEach-Object { Write-Output "  - $_" }
     Read-Host "Press Enter to exit"
     exit 1
 }
 
-Write-Output "✓ Target directory verified: $LogDirectory"
+Write-Output "✓ Target directories to process:"
+foreach ($d in $LogDirectories) {
+    $status = if (Test-Path -Path $d) { "OK" } else { "MISSING (will be skipped)" }
+    Write-Output "  - $d [$status]"
+}
 
 # Create log directory if it doesn't exist
 if (-not (Test-Path -Path $LogDir)) {
@@ -129,13 +133,32 @@ if (-not (Test-Path -Path $TargetDir)) {
     Write-LogEntry "✓ Created directory: $TargetDir"
 }
 
-# Create safety marker in TARGET DELETION directory to verify it's accessible
-try {
-    Set-Content -Path $SafetyMarkerFile -Value "LogRemover Safety Marker - Target Directory Verified" -Force
-    Write-LogEntry "✓ Created safety marker in target directory"
-} catch {
-    Write-LogEntry "WARNING: Could not create marker in target directory - check write permissions" "WARNING"
+# ============================================================================
+# SAFETY: Reject dangerous directories BEFORE deploying the script
+# ============================================================================
+$ForbiddenPaths = @(
+    "C:\", "C:\Windows", "C:\Windows\System32", "C:\Windows\SysWOW64",
+    "C:\Program Files", "C:\Program Files (x86)", "C:\Users", "C:\ProgramData",
+    "C:\Windows\System", "C:\Windows\Boot", "C:\Windows\Fonts"
+)
+
+foreach ($dir in $LogDirectories) {
+    $normalized = $dir.TrimEnd('\')
+    # Block exact matches to protected system paths
+    if ($ForbiddenPaths -contains $normalized) {
+        Write-Output "❌ CRITICAL: Refusing to install - dangerous directory in list: $dir"
+        Write-Output "This path is a protected system location and will NOT be processed."
+        Read-Host "Press Enter to exit"
+        exit 1
+    }
+    # Block anything with fewer than 2 path segments (e.g. C:\ or D:\)
+    if (($normalized -split '\\').Count -lt 2 -or $normalized -match '^[A-Za-z]:$') {
+        Write-Output "❌ CRITICAL: Refusing to install - path too shallow / drive root: $dir"
+        Read-Host "Press Enter to exit"
+        exit 1
+    }
 }
+Write-LogEntry "✓ All configured directories passed the safety denylist"
 
 # Define the BULLETPROOF LogRemover script
 $LogRemoverScript = @'
@@ -144,15 +167,21 @@ $LogRemoverScript = @'
 # CRITICAL: This script has multiple safety checks to prevent deletion of wrong files
 # ============================================================================
 
-# ABSOLUTE PATHS ONLY - Injected by bootstrap at install time
-$TargetLogDir = "__TARGET_LOG_DIR__"
+# Injected by bootstrap at install time
+$TargetLogDirs = __TARGET_LOG_DIRS__
 $LogDir = "__LOG_DIR__"
 $LogFile = "$LogDir\LogRemover.log"
-$SafetyMarkerFile = "__SAFETY_MARKER__"
 $DaysOld = __DAYS_OLD__
 $MaxLogSize = __MAX_LOG_SIZE__
 $MaxLogFiles = __MAX_LOG_FILES__
 $DryRun = __DRY_RUN__
+
+# Protected system paths that must NEVER be processed
+$ForbiddenPaths = @(
+    "C:\", "C:\Windows", "C:\Windows\System32", "C:\Windows\SysWOW64",
+    "C:\Program Files", "C:\Program Files (x86)", "C:\Users", "C:\ProgramData",
+    "C:\Windows\System", "C:\Windows\Boot", "C:\Windows\Fonts"
+)
 
 # VERIFY ADMIN RIGHTS
 $IsAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
@@ -213,129 +242,123 @@ function Rotate-LogFile {
 }
 
 # ============================================================================
-# SAFETY CHECK 1: Verify safety marker file exists in the target directory
-# (Confirms the target dir exists AND is the same one the installer set up)
+# PROCESS EACH DIRECTORY IN THE LIST
 # ============================================================================
-if (-not (Test-Path -Path $SafetyMarkerFile)) {
-    Write-LogEntry "CRITICAL ERROR: Safety marker not found at: $SafetyMarkerFile" "CRITICAL"
-    Write-LogEntry "Target directory is missing or was not set up by the installer. Aborting." "CRITICAL"
-    exit 1
-}
-Write-LogEntry "✓ Safety marker verified in target directory"
-
-# ============================================================================
-# SAFETY CHECK 2: Verify target directory is the correct one
-# ============================================================================
-if (-not (Test-Path -Path $TargetLogDir)) {
-    Write-LogEntry "ERROR: Target directory does not exist: $TargetLogDir" "ERROR"
-    exit 1
-}
-
-if ($TargetLogDir -notlike "*StorageCenter*" -or $TargetLogDir -notlike "*SC*logs*") {
-    Write-LogEntry "CRITICAL ERROR: Invalid target directory path: $TargetLogDir" "CRITICAL"
-    Write-LogEntry "Path must contain 'StorageCenter' and 'SC\logs'. Aborting." "CRITICAL"
-    exit 1
-}
-
-Write-LogEntry "✓ Target directory verified: $TargetLogDir"
-
-# ============================================================================
-# SAFETY CHECK 3: Dry run first - count files only
-# ============================================================================
-Write-LogEntry "Starting cleanup for files older than $DaysOld days"
-Write-LogEntry "Target: $TargetLogDir"
-
 $CutoffDate = (Get-Date).AddDays(-$DaysOld)
-$FilesFound = 0
-$FilesRemoved = 0
-$FilesNotRemoved = 0
+$GrandRemoved = 0
+$GrandNotRemoved = 0
+$GrandFound = 0
 
-try {
-    # Build list of files to delete (excluding the safety marker itself)
-    $FilesToDelete = @()
-    
-    Get-ChildItem -Path $TargetLogDir -File -ErrorAction Stop | Where-Object { 
-        $_.LastWriteTime -lt $CutoffDate -and $_.FullName -ne $SafetyMarkerFile 
-    } | ForEach-Object {
-        $FilesToDelete += $_
-        $FilesFound++
+if ($DryRun) {
+    Write-LogEntry "*** DRY RUN MODE - No files will be deleted ***" "DRYRUN"
+}
+Write-LogEntry "Starting cleanup for files older than $DaysOld days across $($TargetLogDirs.Count) directories"
+
+foreach ($TargetLogDir in $TargetLogDirs) {
+    $TargetLogDir = $TargetLogDir.TrimEnd('\')
+    Write-LogEntry ""
+    Write-LogEntry "------ Processing: $TargetLogDir ------"
+
+    # SAFETY CHECK 1: Directory must exist
+    if (-not (Test-Path -Path $TargetLogDir)) {
+        Write-LogEntry "SKIPPED: Directory does not exist: $TargetLogDir" "WARNING"
+        continue
     }
-    
-    if ($DryRun) {
-        Write-LogEntry "*** DRY RUN MODE - No files will be deleted ***" "DRYRUN"
+
+    # SAFETY CHECK 2: Reject protected system paths
+    if ($ForbiddenPaths -contains $TargetLogDir) {
+        Write-LogEntry "CRITICAL: Refusing to process protected system path: $TargetLogDir" "CRITICAL"
+        continue
     }
-    Write-LogEntry "Found $FilesFound files older than $DaysOld days"
-    
-    # SAFETY CHECK 4: Verify all files are in the correct directory
-    foreach ($File in $FilesToDelete) {
-        $FileDir = Split-Path -Path $File.FullName -Parent
-        if ($FileDir -ne $TargetLogDir) {
-            Write-LogEntry "CRITICAL ERROR: File is not in target directory: $($File.FullName)" "CRITICAL"
-            Write-LogEntry "Expected directory: $TargetLogDir" "CRITICAL"
-            Write-LogEntry "Aborting to prevent data loss" "CRITICAL"
-            exit 1
+
+    # SAFETY CHECK 3: Reject drive roots / too-shallow paths
+    if (($TargetLogDir -split '\\').Count -lt 2 -or $TargetLogDir -match '^[A-Za-z]:$') {
+        Write-LogEntry "CRITICAL: Refusing to process drive root / shallow path: $TargetLogDir" "CRITICAL"
+        continue
+    }
+
+    $FilesFound = 0
+    $FilesRemoved = 0
+    $FilesNotRemoved = 0
+
+    try {
+        # Build list of files to delete
+        $FilesToDelete = @()
+        Get-ChildItem -Path $TargetLogDir -File -ErrorAction Stop | Where-Object { 
+            $_.LastWriteTime -lt $CutoffDate 
+        } | ForEach-Object {
+            $FilesToDelete += $_
+            $FilesFound++
         }
-    }
-    
-    Write-LogEntry "✓ All files verified to be in correct directory"
-    
-    # ============================================================================
-    # ACTUAL DELETION - Only proceed after all checks pass
-    # ============================================================================
-    
-    if ($FilesToDelete.Count -eq 0) {
-        Write-LogEntry "No files older than $DaysOld days found"
-    }
-    elseif ($DryRun) {
-        Write-LogEntry "DRY RUN: The following $($FilesToDelete.Count) files WOULD be deleted:" "DRYRUN"
+
+        Write-LogEntry "Found $FilesFound files older than $DaysOld days"
+
+        # SAFETY CHECK 4: Verify every file's parent is exactly this directory
         foreach ($File in $FilesToDelete) {
-            Write-LogEntry "  [WOULD DELETE] $($File.FullName) (Modified: $($File.LastWriteTime))" "DRYRUN"
+            $FileDir = (Split-Path -Path $File.FullName -Parent).TrimEnd('\')
+            if ($FileDir -ne $TargetLogDir) {
+                Write-LogEntry "CRITICAL: File outside target dir, skipping whole directory: $($File.FullName)" "CRITICAL"
+                $FilesToDelete = @()
+                break
+            }
         }
-        Write-LogEntry "DRY RUN complete - nothing was deleted" "DRYRUN"
-    }
-    else {
-        Write-LogEntry "Proceeding with deletion of $($FilesToDelete.Count) files"
-        
-        foreach ($File in $FilesToDelete) {
-            try {
-                # FINAL CHECK: Verify file is still in correct directory before deletion
-                $ParentDir = Split-Path -Path $File.FullName -Parent
-                if ($ParentDir -eq $TargetLogDir) {
-                    Remove-Item -Path $File.FullName -Force
-                    Write-LogEntry "Removed: $($File.FullName) (Modified: $($File.LastWriteTime))"
-                    $FilesRemoved++
-                } else {
-                    Write-LogEntry "SKIPPED: File not in target directory: $($File.FullName)" "WARNING"
+
+        if ($FilesToDelete.Count -eq 0) {
+            Write-LogEntry "Nothing to delete in this directory"
+        }
+        elseif ($DryRun) {
+            Write-LogEntry "DRY RUN: $($FilesToDelete.Count) files WOULD be deleted:" "DRYRUN"
+            foreach ($File in $FilesToDelete) {
+                Write-LogEntry "  [WOULD DELETE] $($File.FullName) (Modified: $($File.LastWriteTime))" "DRYRUN"
+            }
+        }
+        else {
+            foreach ($File in $FilesToDelete) {
+                try {
+                    # FINAL per-file check right before deletion
+                    $ParentDir = (Split-Path -Path $File.FullName -Parent).TrimEnd('\')
+                    if ($ParentDir -eq $TargetLogDir) {
+                        Remove-Item -Path $File.FullName -Force
+                        Write-LogEntry "Removed: $($File.FullName) (Modified: $($File.LastWriteTime))"
+                        $FilesRemoved++
+                    } else {
+                        Write-LogEntry "SKIPPED: File not in target directory: $($File.FullName)" "WARNING"
+                        $FilesNotRemoved++
+                    }
+                }
+                catch {
+                    Write-LogEntry "Failed to remove: $($File.FullName) - Error: $_" "WARNING"
                     $FilesNotRemoved++
                 }
             }
-            catch {
-                Write-LogEntry "Failed to remove: $($File.FullName) - Error: $_" "WARNING"
-                $FilesNotRemoved++
-            }
         }
+
+        Write-LogEntry "Directory summary: Found $FilesFound, Removed $FilesRemoved, Failed $FilesNotRemoved"
+        $GrandFound += $FilesFound
+        $GrandRemoved += $FilesRemoved
+        $GrandNotRemoved += $FilesNotRemoved
     }
-    
-    Write-LogEntry ""
-    Write-LogEntry "=========================================="
-    if ($DryRun) {
-        Write-LogEntry "DRY RUN Summary: $FilesFound files would be deleted."
-    } else {
-        Write-LogEntry "Summary: Removed $FilesRemoved files. Failed to remove $FilesNotRemoved files."
+    catch {
+        Write-LogEntry "ERROR processing $TargetLogDir : $_" "ERROR"
     }
-    Write-LogEntry "=========================================="
 }
-catch {
-    Write-LogEntry "CRITICAL ERROR during cleanup: $_" "ERROR"
-    Write-LogEntry "No files were deleted" "ERROR"
-    exit 1
+
+Write-LogEntry ""
+Write-LogEntry "=========================================="
+if ($DryRun) {
+    Write-LogEntry "DRY RUN TOTAL: $GrandFound files would be deleted across all directories."
+} else {
+    Write-LogEntry "TOTAL: Removed $GrandRemoved files. Failed $GrandNotRemoved. (Found $GrandFound)"
 }
+Write-LogEntry "=========================================="
 '@
 
+# Build a PowerShell array literal from the directory list
+$DirArrayLiteral = "@(" + (($LogDirectories | ForEach-Object { "'" + $_.TrimEnd('\') + "'" }) -join ", ") + ")"
+
 # Inject configuration values into the script (replaces placeholder tokens)
-$LogRemoverScript = $LogRemoverScript.Replace('__TARGET_LOG_DIR__', $LogDirectory)
+$LogRemoverScript = $LogRemoverScript.Replace('__TARGET_LOG_DIRS__', $DirArrayLiteral)
 $LogRemoverScript = $LogRemoverScript.Replace('__LOG_DIR__', $LogDir)
-$LogRemoverScript = $LogRemoverScript.Replace('__SAFETY_MARKER__', $SafetyMarkerFile)
 $LogRemoverScript = $LogRemoverScript.Replace('__DAYS_OLD__', $DaysOld)
 $LogRemoverScript = $LogRemoverScript.Replace('__MAX_LOG_SIZE__', '50MB')
 $LogRemoverScript = $LogRemoverScript.Replace('__MAX_LOG_FILES__', $MaxLogFiles)
@@ -367,7 +390,7 @@ try {
                           -Action $Action `
                           -Trigger $Trigger `
                           -Settings $Settings `
-                          -Description "Safely removes log files older than $DaysOld days from several Log files see Script" `
+                          -Description "Safely removes log files older than $DaysOld days from several Folders see Script which is executed" `
                           -RunLevel Highest `
                           -Force | Out-Null
     
@@ -392,15 +415,17 @@ Write-LogEntry "LogRemover is now installed and configured:"
 Write-LogEntry "  • Script location: $ScriptFile"
 Write-LogEntry "  • Scheduled task: $TaskName"
 Write-LogEntry "  • Daily execution: $ScheduleTime"
-Write-LogEntry "  • Target directory: $LogDirectory"
 Write-LogEntry "  • Removes files older than: $DaysOld days"
+Write-LogEntry "  • Dry-run mode: $DryRun"
 Write-LogEntry "  • Log location: $LogFile"
+Write-LogEntry "  • Target directories:"
+foreach ($d in $LogDirectories) { Write-LogEntry "      - $d" }
 Write-LogEntry ""
 Write-LogEntry "Safety features:"
-Write-LogEntry "  ✓ Multiple path validations"
-Write-LogEntry "  ✓ Dry-run before deletion"
-Write-LogEntry "  ✓ Per-file directory verification"
+Write-LogEntry "  ✓ Denylist of protected system paths"
+Write-LogEntry "  ✓ Drive-root / shallow-path rejection"
+Write-LogEntry "  ✓ Per-file directory verification (twice)"
+Write-LogEntry "  ✓ Dry-run mode available"
 Write-LogEntry "  ✓ Admin rights check"
-Write-LogEntry "  ✓ Safety marker verification"
 Write-LogEntry ""
 Write-LogEntry "You can close this window."
