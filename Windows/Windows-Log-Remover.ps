@@ -28,8 +28,6 @@ $LogDir        = Join-Path $TargetDir "Logs"
 $LogFile       = Join-Path $LogDir "LogRemover.log"
 $MaxLogSize    = 50MB
 $MaxLogFiles   = 3
-$RegistryPath  = "HKCU:\Software\LogRemover"
-$RegistryKey   = "Installed"
 #### THIS DIRECTORY WILL BE CLEANED ############
 #### THIS DIRECTORY WILL BE CLEANED ############
 $LogDirectory  = "C:\inetpub\wwwroot\Citrix\StorageCenter\SC\logs"    #### THIS DIRECTORY WILL BE CLEANED ############
@@ -369,7 +367,7 @@ try {
                           -Action $Action `
                           -Trigger $Trigger `
                           -Settings $Settings `
-                          -Description "Safely removes log files older than $DaysOld days from StorageCenter" `
+                          -Description "Safely removes log files older than $DaysOld days from several Log files see Script" `
                           -RunLevel Highest `
                           -Force | Out-Null
     
@@ -383,17 +381,7 @@ catch {
     exit 1
 }
 
-# Mark as installed in registry
-try {
-    if (-not (Test-Path -Path $RegistryPath)) {
-        New-Item -Path $RegistryPath -Force | Out-Null
-    }
-    New-ItemProperty -Path $RegistryPath -Name $RegistryKey -Value "1" -PropertyType DWORD -Force | Out-Null
-    Write-LogEntry "✓ Registry entry created: $RegistryPath\$RegistryKey"
-}
-catch {
-    Write-LogEntry "Could not create registry entry: $_" "WARNING"
-}
+
 
 Write-LogEntry ""
 Write-LogEntry "=========================================="
