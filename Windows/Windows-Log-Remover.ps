@@ -28,15 +28,21 @@ $LogDir        = Join-Path $TargetDir "Logs"
 $LogFile       = Join-Path $LogDir "LogRemover.log"
 $MaxLogSize    = 50MB
 $MaxLogFiles   = 3
+###############################################
+###############################################
 $LogDirectories = @(
     "C:\inetpub\logs\LogFiles\W3SVC1"
     "C:\inetpub\wwwroot\Citrix\StorageCenter\SC\logs"
     "C:\temp"
 )
+###############################################
+###############################################
 $DaysOld       = 5
 $TaskName      = "LogRemover-CleanOldFiles"
 $ScheduleTime  = "02:00"
-$DryRun        = $false   # <-- Set to $true to LOG what WOULD be deleted, without deleting anything
+#### -- Set to $true to LOG what WOULD be deleted, without deleting anything -- ####
+    $DryRun        = $false
+#### -- Set to $true to LOG what WOULD be deleted, without deleting anything -- ####
 
 Write-Output ""
 Write-Output "=========================================="
