@@ -33,13 +33,12 @@ $RegistryKey   = "Installed"
 #### THIS DIRECTORY WILL BE CLEANED ############
 #### THIS DIRECTORY WILL BE CLEANED ############
 $LogDirectory  = "C:\inetpub\wwwroot\Citrix\StorageCenter\SC\logs"    #### THIS DIRECTORY WILL BE CLEANED ############
-$DryRun        = $true  
+$DryRun        = $true     # if true, only show whats beeing deleted
 #### THIS DIRECTORY WILL BE CLEANED ############
 #### THIS DIRECTORY WILL BE CLEANED ############
 $DaysOld       = 5
 $TaskName      = "LogRemover-CleanOldFiles"
 $ScheduleTime  = "02:00"
- 
 $SafetyMarkerFile = Join-Path $LogDirectory ".logremover_safety_marker"
 
 Write-Output ""
