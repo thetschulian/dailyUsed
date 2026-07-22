@@ -293,6 +293,7 @@ set "adminScript=%basicTempDir%\Windows-Admin-Tasks.cmd"
 	echo net stop w32time >> "%adminScript%"
 	echo net start w32time >> "%adminScript%"
 	echo w32tm /query /status >> "%adminScript%"
+	echo powershell -Command "Set-TimeZone -Id 'W. Europe Standard Time'" >>  "%adminScript%"
 	
 	echo schtasks /create /tn "daily_Kill_Tool" /tr "C:\Windows\System32\taskkill.exe /IM Tool.exe /F" /sc daily /st 20:00 /ru "SYSTEM" /f >> "%adminScript%"
 
